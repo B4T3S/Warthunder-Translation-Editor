@@ -33,6 +33,12 @@ elif game_config and '  testLocalization:b=yes\n' in game_config and not path.ex
     print(f"\n{colors.RED} FOUND {colors.CYAN}'testLocalization'{colors.RED} KEY IN CONFIG BUT NO {colors.CYAN}'lang'{colors.RED} FOLDER! DID YOU RUN THE GAME ONCE?{colors.END}")
     exit(404)
 
-csv = pd.read_csv(open(f'{conf.get('game_path')}\\lang\\menu.csv', 'r', encoding="utf8"), sep=';', index_col=[0])
-print(csv.columns)
-print(csv.loc['demo', '<German>'])
+def main():
+    csv = pd.read_csv(open(f'{conf.get('game_path')}\\lang\\menu.csv', 'r', encoding="utf8"), sep=';', index_col=[0])
+    print(csv.columns)
+    languages = csv.columns[:-2]
+    print(languages)
+    print(csv.loc['exp_reasons/assist', '<German>'])
+
+if __name__ == "__main__":
+    main()
