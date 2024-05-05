@@ -1,0 +1,3 @@
+pyyaml
+pypiwin32
+pandas
