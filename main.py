@@ -1,18 +1,20 @@
 import pandas as pd
 import inquirer as inq
-from scripts import colors, config, common
+from scripts import console, config, common
 from os import path, system
 from platform import system
 
 # Since we use the win32 API in config.py this script will not work on any other OS for now
 if system() != 'Windows':
-    print(f"\n{colors.RED} PLATFORM IS NOT WINDOWS. EXITING.")
-    exit(1)
+    print(f"\n{console.Colors.RED} PLATFORM IS NOT WINDOWS. EXITING.")
+    die(1)
 
-# Just a quick function to clear the console
-cls = lambda: print("\033c", end='')
+def die(code: int = 0):
+    print("Press enter to exit...")
+    input()
+    exit(code)
 
-# Load script the config
+# Load the script config
 conf = config.Configuration()
 
 # Get the games config file
@@ -20,34 +22,31 @@ game_config = open(f'{conf.get('game_path')}\\config.blk', 'r+').readlines()
 
 # Update the games config file if neccessary
 if game_config and not '  testLocalization:b=yes\n' in game_config:
-    print(f"{colors.YELLOW}FOUND GAME CONFIG BUT NO LOCALIZATION ACTIVE. CREATING BACKUP FILE {colors.CYAN}'config.blk.backup'{colors.END}")
+    console.pretty_print("FOUND GAME CONFIG BUT NO LOCALIZATION ACTIVE. CREATING BACKUP FILE <'config.blk.backup'>", console.Colors.YELLOW)
     with open(f'{conf.get('game_path')}\\config.blk.backup', 'w+') as backup:
         backup.writelines(game_config)
-        print(f"{colors.YELLOW}BACKUP CREATED! UPDATING ORIGINAL...{colors.END}")
+        console.pretty_print("BACKUP CREATED! UPDATING ORIGINAL...", console.Colors.YELLOW)
     debug_index = game_config.index('debug{\n')
     if debug_index:
         game_config.insert(debug_index+1, '  testLocalization:b=yes\n')
         with open(f'{conf.get('game_path')}\\config.blk', 'w') as config_file:
             config_file.writelines(game_config)
-        print(f"\n{colors.GREEN}CONFIG UPDATED! RUN THE GAME ONCE TO GENERATE BASE TRANSLATION FILES!{colors.END}\n")
+        console.pretty_print("CONFIG UPDATED! RUN THE GAME ONCE TO GENERATE BASE TRANSLATION FILES!", console.Colors.GREEN)
         input("Press enter to quit...")
         exit(0)
 
 # If there is no lang folder, warn the user and quit
 elif game_config and '  testLocalization:b=yes\n' in game_config and not path.exists(f'{conf.get('game_path')}\\lang'):
-    print(f"\n{colors.RED} FOUND {colors.CYAN}'testLocalization'{colors.RED} KEY IN CONFIG BUT NO {colors.CYAN}'lang'{colors.RED} FOLDER! DID YOU RUN THE GAME ONCE?{colors.END}\n")
-    pause("Press enter to quit...")
-    exit(404)
+    console.pretty_print("FOUND <'testLocalization'> KEY IN CONFIG BUT NO <'lang'> FOLDER! DID YOU RUN THE GAME ONCE?", console.Colors.RED)
+    die(404)
 
 def _choice(title, options, question, default: int = None, allow_none: bool = False):
     ret = None
-    cls()
-    print("-"*30)
-    print(f"{colors.BLUE}{title}{colors.END}")
-    print("-"*30)
+    console.cls()
+    console.title(title)
     i = 1
     for option in options:
-        print(f"{colors.BLUE}{i}: {colors.CYAN}{option}{colors.END}")
+        console.pretty_print(f"{i}: <{option}>")
         i += 1
     print("-"*30)
     while True:
@@ -78,14 +77,14 @@ def main():
     changes = {}
 
     while True:
-        cls()
-        options = list(map(lambda x: f'{csv.loc[x, language]}{f"{colors.END} => {colors.RED}{changes[x]}{colors.CYAN}" if x in changes.keys() else ""}', common.COMMON_IDS))
-        string_to_edit = _choice(f"{colors.BLUE}Editing {colors.CYAN}{language}{colors.BLUE} strings!\nPick one of the pre-chosen strings to edit (Search feature coming soon)\nJust press {colors.CYAN}[Enter]{colors.BLUE} without any input to save changes and exit.{colors.END}", options, 'String to edit', allow_none=True)
+        console.cls()
+        options = list(map(lambda x: f'{csv.loc[x, language]}{f"{console.Colors.END} => {console.Colors.RED}{changes[x]}{console.Colors.CYAN}" if x in changes.keys() else ""}', common.COMMON_IDS))
+        string_to_edit = _choice(f"{console.Colors.BLUE}Editing {console.Colors.CYAN}{language}{console.Colors.BLUE} strings!\nPick one of the pre-chosen strings to edit (Search feature coming soon)\nJust press {console.Colors.CYAN}[Enter]{console.Colors.BLUE} without any input to save changes and exit.{console.Colors.END}", options, 'String to edit', allow_none=True)
         
         if string_to_edit is not None:
-            cls()
+            console.cls()
             print("-"*30)
-            print(f"{colors.BLUE}Enter replacement string for {colors.CYAN}{csv.loc[common.COMMON_IDS[string_to_edit], language]}{colors.BLUE}\nAlternatively, hit {colors.CYAN}[Enter]{colors.BLUE} without any input to cancel.{colors.END}")
+            print(f"{console.Colors.BLUE}Enter replacement string for {console.Colors.CYAN}{csv.loc[common.COMMON_IDS[string_to_edit], language]}{console.Colors.BLUE}\nAlternatively, hit {console.Colors.CYAN}[Enter]{console.Colors.BLUE} without any input to cancel.{console.Colors.END}")
             print("-"*30)
             while True:
                 new_text = input('New text: ')
@@ -93,28 +92,26 @@ def main():
                     changes[common.COMMON_IDS[string_to_edit]] = new_text
                 break;
         else:
-            cls()
+            console.cls()
             if len(changes.keys()) > 0:
                 print("-"*30)
-                print(f"{colors.CYAN}{len(changes.keys())}{colors.BLUE} changes were made. Applying...{colors.END}")
+                print(f"{console.Colors.CYAN}{len(changes.keys())}{console.Colors.BLUE} changes were made. Applying...{console.Colors.END}")
                 print("-"*30)
                 for change in changes.keys():
-                    print(f"{colors.CYAN}{csv.loc[change, language]}{colors.END} => {colors.RED}{changes[change]}{colors.END}")
+                    print(f"{console.Colors.CYAN}{csv.loc[change, language]}{console.Colors.END} => {console.Colors.RED}{changes[change]}{console.Colors.END}")
                     csv.loc[change, language] = changes[change]
                 csv.to_csv(open(f'{conf.get('game_path')}\\lang\\menu.csv', 'w', encoding="utf8"), encoding="utf8", sep=';')
                 print("-"*30)
-                print(f"{colors.BLUE} All changes applied. Exiting.{colors.END}")
+                print(f"{console.Colors.BLUE} All changes applied. Exiting.{console.Colors.END}")
                 print("-"*30)
                 print()
-                input("Press enter to quit...")
-                exit(0)
+                die(0)
             else:
                 print("-"*30)
-                print(f"{colors.BLUE}No changes were made. Exiting.{colors.END}")
+                print(f"{console.Colors.BLUE}No changes were made. Exiting.{console.Colors.END}")
                 print("-"*30)
                 print()
-                input("Press enter to quit...")
-                exit(0)
+                die(0)
 
 if __name__ == "__main__":
     main()

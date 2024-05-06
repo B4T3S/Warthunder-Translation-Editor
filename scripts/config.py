@@ -1,8 +1,9 @@
 # This is a simple helper class to manage the configuration of this script
 import win32api
+import inquirer as inq
 from os import listdir, mkdir, path, getenv
 from yaml import safe_load, safe_dump
-from scripts import colors
+from scripts import console
 
 class Configuration:
     folder_path = f"{getenv('LOCALAPPDATA')}\\War Thunder translation editor"
@@ -26,11 +27,23 @@ class Configuration:
         if not 'version' in self.config.keys():
             self.set('version', self.version)
 
+        if not 'display_colors' in self.config.keys():
+            self._check_colors()
+        elif self.get('display_colors') is False:
+            console.disable_colors()
+
         if not 'game_path' in self.config.keys():
             self._find_game()
 
+    def _check_colors(self):
+        print(f"\n{console.Colors.RED}◼{console.Colors.END}\n")
+        enable = inq.prompt([inq.Confirm('enable', message="Does this look like a red square?")])['enable']
+        self.set('display_colors', enable)
+        if not enable:
+            console.disable_colors()
+
     def _find_game(self):
-        print(f"{colors.CYAN}'game_path'{colors.YELLOW} not set! Trying to locate warthunder...{colors.END}")
+        console.pretty_print("<'game_path'> not set! Trying to locate warthunder...", console.Colors.YELLOW)
         drives = win32api.GetLogicalDriveStrings()
         drives = drives.split('\000')[:-1]
         
@@ -38,23 +51,24 @@ class Configuration:
             letter = drive[0]
             if letter == 'C':
                 if path.exists("C:\\Program Files (x86)\\Steam\\steamapps\\common\\War Thunder\\config.blk"):
-                    print(f"{colors.GREEN}Found game on drive {colors.CYAN}{letter}{colors.END}")
+                    console.pretty_print(f"Found the game on drive <{letter}>", console.Colors.GREEN)
                     self.set('game_path', "C:\\Program Files (x86)\\Steam\\steamapps\\common\\War Thunder")
                     return
                 if path.exists("C:\\Program Files\\Steam\\steamapps\\common\\War Thunder\\config.blk"):
-                    print(f"{colors.GREEN}Found game on drive {colors.CYAN}{letter}{colors.END}")
+                    console.pretty_print(f"Found the game on drive <{letter}>", console.Colors.GREEN)
                     self.set('game_path', "C:\\Program Files\\Steam\\steamapps\\common\\War Thunder")
                     return
             
             if path.exists(f"{letter}:\\SteamLibrary\\steamapps\\common\\War Thunder\\config.blk"):
-                print(f"{colors.GREEN}Found game on drive {colors.CYAN}{letter}{colors.END}")
+                console.pretty_print(f"Found the game on drive <{letter}>", console.Colors.GREEN)
                 self.set('game_path', f"{letter}:\\SteamLibrary\\steamapps\\common\\War Thunder")
                 return
         
         print(f"{colors.RED}Couldn't find game! Enter path manually... {colors.YELLOW}(The path to your game files){colors.END}")
+        console.pretty_print(f"Couldn't find the game! Enter the path manually...", console.Colors.RED)
         while True:
-            _path = input('Enter path:')
-            if _path.exists(f"{path}\\config.blk"):
+            _path = inq.prompt([inq.Path('path', path_type=inq.Path.DIRECTORY)])['path']
+            if path.exists(f"{_path}\\config.blk"):
                 print(f"{colors.GREEN}Path successfully set!{colors.END}")
                 break;
             else:
