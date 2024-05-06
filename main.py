@@ -28,12 +28,14 @@ if game_config and not '  testLocalization:b=yes\n' in game_config:
         game_config.insert(debug_index+1, '  testLocalization:b=yes\n')
         with open(f'{conf.get('game_path')}\\config.blk', 'w') as config_file:
             config_file.writelines(game_config)
-        print(f"\n{colors.GREEN}CONFIG UPDATED! RUN THE GAME ONCE TO GENERATE BASE TRANSLATION FILES!{colors.END}")
+        print(f"\n{colors.GREEN}CONFIG UPDATED! RUN THE GAME ONCE TO GENERATE BASE TRANSLATION FILES!{colors.END}\n")
+        input("Press enter to quit...")
         exit(0)
 
 # If there is no lang folder, warn the user and quit
 elif game_config and '  testLocalization:b=yes\n' in game_config and not path.exists(f'{conf.get('game_path')}\\lang'):
-    print(f"\n{colors.RED} FOUND {colors.CYAN}'testLocalization'{colors.RED} KEY IN CONFIG BUT NO {colors.CYAN}'lang'{colors.RED} FOLDER! DID YOU RUN THE GAME ONCE?{colors.END}")
+    print(f"\n{colors.RED} FOUND {colors.CYAN}'testLocalization'{colors.RED} KEY IN CONFIG BUT NO {colors.CYAN}'lang'{colors.RED} FOLDER! DID YOU RUN THE GAME ONCE?{colors.END}\n")
+    pause("Press enter to quit...")
     exit(404)
 
 def _choice(title, options, question, default: int = None, allow_none: bool = False):
@@ -102,11 +104,15 @@ def main():
                 print("-"*30)
                 print(f"{colors.BLUE} All changes applied. Exiting.{colors.END}")
                 print("-"*30)
+                print()
+                input("Press enter to quit...")
                 exit(0)
             else:
                 print("-"*30)
                 print(f"{colors.BLUE}No changes were made. Exiting.{colors.END}")
                 print("-"*30)
+                print()
+                input("Press enter to quit...")
                 exit(0)
 
 if __name__ == "__main__":
