@@ -5,8 +5,10 @@ from yaml import safe_load, safe_dump
 from scripts import colors
 
 class Configuration:
-    mkdir(f"{getenv('LOCALAPPDATA')}\\War Thunder translation editor")
-    file_path = f"{getenv('LOCALAPPDATA')}/War Thunder translation editor/config.yml"
+    folder_path = f"{getenv('LOCALAPPDATA')}\\War Thunder translation editor"
+    file_path = f"{folder_path}/config.yml"
+    if not path.exists(folder_path):
+        mkdir(folder_path)
     version = 1  # Version of the config file.
     config = {}
 
