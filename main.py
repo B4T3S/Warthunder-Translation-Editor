@@ -86,7 +86,7 @@ def main():
             print("-"*30)
             while True:
                 new_text = input('New text: ')
-                if new_text is not "":
+                if new_text != "":
                     changes[common.COMMON_IDS[string_to_edit]] = new_text
                 break;
         else:
