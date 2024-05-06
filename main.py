@@ -1,7 +1,8 @@
+import pandas as pd
+import inquirer as inq
 from scripts import colors, config, common
 from os import path, system
 from platform import system
-import pandas as pd
 
 # Since we use the win32 API in config.py this script will not work on any other OS for now
 if system() != 'Windows':
@@ -73,7 +74,7 @@ def _choice(title, options, question, default: int = None, allow_none: bool = Fa
 def main():
     csv = pd.read_csv(open(f'{conf.get('game_path')}\\lang\\menu.csv', 'r', encoding="utf8"), sep=';', index_col=[0])
     languages = csv.columns[:-2]
-    language = languages[_choice("Choose a language to edit", languages, "Pick a language", 1)]
+    language = inq.prompt([inq.List('lang', message="Choose a language to edit", choices=list(languages), carousel=True)])['lang']
     changes = {}
 
     while True:
