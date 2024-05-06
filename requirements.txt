@@ -1,3 +1,4 @@
 pyyaml
 pypiwin32
 pandas
+pyinstaller

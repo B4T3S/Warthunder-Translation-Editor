@@ -1,18 +1,19 @@
 # This is a simple helper class to manage the configuration of this script
 import win32api
-from os import listdir, path
+from os import listdir, mkdir, path, getenv
 from yaml import safe_load, safe_dump
 from scripts import colors
 
 class Configuration:
+    mkdir(f"{getenv('LOCALAPPDATA')}\\War Thunder translation editor")
+    file_path = f"{getenv('LOCALAPPDATA')}/War Thunder translation editor/config.yml"
     version = 1  # Version of the config file.
     config = {}
 
     def __init__(self):
-        files = listdir()
-        if not 'config.yml' in files:
-            open('./config.yml', 'w+').close()
-        with open('./config.yml', 'r') as data:
+        if not path.exists(self.file_path):
+            open(self.file_path, 'w+').close()
+        with open(self.file_path, 'r') as data:
             self.config = safe_load(data)
         self._validate()
     
@@ -59,7 +60,7 @@ class Configuration:
 
     def set(self, key, value):
         self.config[key] = value
-        with open('./config.yml', 'w') as ds:
+        with open(self.file_path, 'w') as ds:
             safe_dump(self.config, ds)
 
     def get(self, key):
