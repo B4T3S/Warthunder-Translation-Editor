@@ -32,7 +32,7 @@ class Configuration:
         elif self.get('display_colors') is False:
             console.disable_colors()
 
-        if not 'game_path' in self.config.keys():
+        if not 'game_path' in self.config.keys() or not path.exists(f'{self.get('game_path')}\\config.blk'):
             self._find_game()
 
     def _check_colors(self):
@@ -64,12 +64,12 @@ class Configuration:
                 self.set('game_path', f"{letter}:\\SteamLibrary\\steamapps\\common\\War Thunder")
                 return
         
-        print(f"{colors.RED}Couldn't find game! Enter path manually... {colors.YELLOW}(The path to your game files){colors.END}")
         console.pretty_print(f"Couldn't find the game! Enter the path manually...", console.Colors.RED)
         while True:
             _path = inq.prompt([inq.Path('path', path_type=inq.Path.DIRECTORY)])['path']
             if path.exists(f"{_path}\\config.blk"):
-                print(f"{colors.GREEN}Path successfully set!{colors.END}")
+                print(f"{console.Colors.GREEN}Path successfully set!{console.Colors.END}")
+                self.set('game_path', _path)
                 break;
             else:
                 print("Game not found in that path!")
