@@ -1,7 +1,7 @@
 import pandas as pd
 import inquirer as inq
 from scripts import console, config, common
-from os import path, system
+from os import path, system as sys
 from platform import system
 
 # Since we use the win32 API in config.py this script will not work on any other OS for now
@@ -9,6 +9,10 @@ if system() != 'Windows':
     print(f"\n{console.Colors.RED} PLATFORM IS NOT WINDOWS. EXITING.")
     die(1)
 
+# For some goddamn reason windows 10 needs this to display colors:
+sys("color")
+
+# Function to kill the script "cleanly"
 def die(code: int = 0):
     print("Press enter to exit...")
     input()
