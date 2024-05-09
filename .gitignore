@@ -162,3 +162,6 @@ cython_debug/
 # --- END OF PYTHON GITIGNORE ---
 # Ignore local script config
 config.yml
+
+# Ignore local niceGUI storage
+.nicegui
