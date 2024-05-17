@@ -17,3 +17,17 @@ install: # Runs pip install
 .PHONY: build
 build: # Builds a ready to use .EXE
 	./.venv/Scripts/pyinstaller main.py -F -w -n War\ Thunder\ translation\ editor --add-data .venv/Lib/site-packages/nicegui:nicegui --add-data .venv/Lib/site-packages/webview:webview
+
+.PHONY: setup-runner
+setup-runner: # Sets up a .venv and installs all needed packages
+	python -m venv .venv
+	./.venv/bin/activate
+	make install
+
+.PHONY: install-runner
+install-runner: # Runs pip install
+	./.venv/bin/pip install -r requirements.txt
+
+.PHONY: build-runner
+build-runner: # Builds a ready to use .EXE
+	./.venv/bin/pyinstaller main.py -F -w -n War\ Thunder\ translation\ editor --add-data .venv/Lib/site-packages/nicegui:nicegui --add-data .venv/Lib/site-packages/webview:webview

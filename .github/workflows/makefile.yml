@@ -2,32 +2,31 @@ name: Makefile CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.12.x'
-        architecture: 'x64'
-    
-    - name: Install dependencies
-      run: python -m venv .venv && ls .venv/ -la && make install
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12.x"
+          architecture: "x64"
 
-    - name: Run build
-      run: make build
-    
-    - uses: actions/upload-artifact@v4
-      name: "Upload artifacts"
-      with:
-        name: Windows-x64
-        path: dist
+      - name: Install dependencies
+        run: make setup-runner
+
+      - name: Run build
+        run: make build-runner
+
+      - uses: actions/upload-artifact@v4
+        name: "Upload artifacts"
+        with:
+          name: Windows-x64
+          path: dist
