@@ -21,7 +21,7 @@ jobs:
         architecture: 'x64'
     
     - name: Install dependencies
-      run: python -m venv .venv && ls -la && make install
+      run: python -m venv .venv && ls .venv/Scripts/ -la && make install
 
     - name: Run build
       run: make build
