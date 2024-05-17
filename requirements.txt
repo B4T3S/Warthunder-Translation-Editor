@@ -1,4 +1,4 @@
-pypiwin32
+pywin32
 pandas
 pyinstaller
 nicegui
