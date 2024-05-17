@@ -1,10 +1,11 @@
 # This file provides some basic helper functions, to keep the main file clean(-ish)
 
 import pandas as pd
+import random
 
 from os import path
 from platform import system
-from nicegui import ui
+from nicegui import ui, elements
 
 def is_windows():
     return system() == 'Windows'
@@ -63,5 +64,5 @@ def validate_lang_file(_path: str):
     return path.exists(f'{_path}\\lang\\menu.csv')
 
 def load_translations(_path: str):
-    csv = pd.read_csv(open(f'{_path}\\lang\\menu.csv', 'r', encoding="utf8"), sep=';', index_col=[0])
+    csv = pd.read_csv(open(f'{_path}\\lang\\menu.csv', 'r', encoding="utf8"), sep=';')
     return csv

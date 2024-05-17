@@ -1,6 +1,5 @@
-pyyaml
 pypiwin32
 pandas
 pyinstaller
-inquirer
 nicegui
+pywebview

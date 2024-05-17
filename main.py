@@ -1,121 +1,119 @@
 import pandas as pd
-import inquirer as inq
-from scripts import console, config, common
-from os import path, system as sys
-from platform import system
+from nicegui import app, ui
+from scripts import file_picker as fp, helpers, editor
+from os import path
+from shutil import rmtree
+from subprocess import run
+from _version import __version__
 
-# Since we use the win32 API in config.py this script will not work on any other OS for now
-if system() != 'Windows':
-    print(f"\n{console.Colors.RED} PLATFORM IS NOT WINDOWS. EXITING.")
-    die(1)
+# --== SET UP VARIABLES ==--
+dark = ui.dark_mode().bind_value(app.storage.general, 'dark_mode')
+file_picker = fp.local_file_picker('C:/', multiple=False)
+config_stepper = None
+translations = None
+language_selector = None
 
-# For some goddamn reason windows 10 needs this to display colors:
-sys("color")
+# --== FUNCTIONS ==--
 
-# Function to kill the script "cleanly"
-def die(code: int = 0):
-    print("Press enter to exit...")
-    input()
-    exit(code)
+def toggle_dark_theme():
+    app.storage.general['dark_mode'] = not dark.value
 
-# Load the script config
-conf = config.Configuration()
+def set_game_path(path: str):
+    app.storage.general['game_path'] = path
+    file_picker.close()
+    update_stepper()
 
-# Get the games config file
-game_config = open(f'{conf.get('game_path')}\\config.blk', 'r+').readlines()
+file_picker.submit = set_game_path
 
-# Update the games config file if neccessary
-if game_config and not '  testLocalization:b=yes\n' in game_config:
-    console.pretty_print("FOUND GAME CONFIG BUT NO LOCALIZATION ACTIVE. CREATING BACKUP FILE <'config.blk.backup'>", console.Colors.YELLOW)
-    with open(f'{conf.get('game_path')}\\config.blk.backup', 'w+') as backup:
-        backup.writelines(game_config)
-        console.pretty_print("BACKUP CREATED! UPDATING ORIGINAL...", console.Colors.YELLOW)
-    debug_index = game_config.index('debug{\n')
-    if debug_index:
-        game_config.insert(debug_index+1, '  testLocalization:b=yes\n')
-        with open(f'{conf.get('game_path')}\\config.blk', 'w') as config_file:
-            config_file.writelines(game_config)
-        console.pretty_print("CONFIG UPDATED! RUN THE GAME ONCE TO GENERATE BASE TRANSLATION FILES!", console.Colors.GREEN)
-        input("Press enter to quit...")
-        exit(0)
+def try_find_game():
+    path = helpers.find_game()
+    if path is not None:
+        set_game_path(path)
+    else:
+        ui.notify('Couldn\'t find game automatically, select game folder manually!', type='negative')
 
-# If there is no lang folder, warn the user and quit
-elif game_config and '  testLocalization:b=yes\n' in game_config and not path.exists(f'{conf.get('game_path')}\\lang'):
-    console.pretty_print("FOUND <'testLocalization'> KEY IN CONFIG BUT NO <'lang'> FOLDER! DID YOU RUN THE GAME ONCE?", console.Colors.RED)
-    die(404)
+def update_stepper():
+    if config_stepper == None:
+        return
+    
+    if helpers.validate_game_path(app.storage.general['game_path']) == None:
+        config_stepper.value = 'config'
+    else:
+        return
+    if helpers.validate_game_config(app.storage.general['game_path']):
+        config_stepper.value = 'lang'
+    else:
+        return
+    if helpers.validate_lang_file(app.storage.general['game_path']):
+        config_stepper.value = 'done'
 
-def _choice(title, options, question, default: int = None, allow_none: bool = False):
-    ret = None
-    console.cls()
-    console.title(title)
-    i = 1
-    for option in options:
-        console.pretty_print(f"{i}: <{option}>")
-        i += 1
-    print("-"*30)
-    while True:
-        choice = input(f"{question} (1-{len(options)}){f' [{default}]' if default else ''}: ")
-        try:
-            if choice == "":
-                if default is not None:
-                    ret = default-1
-                    break
-                elif allow_none:
-                    ret = None
-                    break
-                else:
-                    continue
-            choice = int(choice)-1
-            if choice < 0 or choice >= len(options):
-                continue
-            ret = choice
-            break
-        except:
-            pass
-    return ret
+def load_file():
+    translations = helpers.load_translations(app.storage.general['game_path'])
+    if language_selector != None:
+        language_selector.set_options(translations.columns[:-2].to_list())
 
-def main():
-    csv = pd.read_csv(open(f'{conf.get('game_path')}\\lang\\menu.csv', 'r', encoding="utf8"), sep=';', index_col=[0])
-    languages = csv.columns[:-2]
-    language = inq.prompt([inq.List('lang', message="Choose a language to edit", choices=list(languages), carousel=True)])['lang']
-    changes = {}
+def try_update_game_config():
+    if helpers.update_game_config(app.storage.general['game_path']):
+        ui.notify('Updated game config', type='positive')
+    update_stepper()
 
-    while True:
-        console.cls()
-        options = list(map(lambda x: f'{csv.loc[x, language]}{f"{console.Colors.END} => {console.Colors.RED}{changes[x]}{console.Colors.CYAN}" if x in changes.keys() else ""}', common.COMMON_IDS))
-        string_to_edit = _choice(f"{console.Colors.BLUE}Editing {console.Colors.CYAN}{language}{console.Colors.BLUE} strings!\nPick one of the pre-chosen strings to edit (Search feature coming soon)\nJust press {console.Colors.CYAN}[Enter]{console.Colors.BLUE} without any input to save changes and exit.{console.Colors.END}", options, 'String to edit', allow_none=True)
-        
-        if string_to_edit is not None:
-            console.cls()
-            print("-"*30)
-            print(f"{console.Colors.BLUE}Enter replacement string for {console.Colors.CYAN}{csv.loc[common.COMMON_IDS[string_to_edit], language]}{console.Colors.BLUE}\nAlternatively, hit {console.Colors.CYAN}[Enter]{console.Colors.BLUE} without any input to cancel.{console.Colors.END}")
-            print("-"*30)
-            while True:
-                new_text = input('New text: ')
-                if new_text != "":
-                    changes[common.COMMON_IDS[string_to_edit]] = new_text
-                break;
-        else:
-            console.cls()
-            if len(changes.keys()) > 0:
-                print("-"*30)
-                print(f"{console.Colors.CYAN}{len(changes.keys())}{console.Colors.BLUE} changes were made. Applying...{console.Colors.END}")
-                print("-"*30)
-                for change in changes.keys():
-                    print(f"{console.Colors.CYAN}{csv.loc[change, language]}{console.Colors.END} => {console.Colors.RED}{changes[change]}{console.Colors.END}")
-                    csv.loc[change, language] = changes[change]
-                csv.to_csv(open(f'{conf.get('game_path')}\\lang\\menu.csv', 'w', encoding="utf8"), encoding="utf8", sep=';')
-                print("-"*30)
-                print(f"{console.Colors.BLUE} All changes applied. Exiting.{console.Colors.END}")
-                print("-"*30)
-                print()
-                die(0)
-            else:
-                print("-"*30)
-                print(f"{console.Colors.BLUE}No changes were made. Exiting.{console.Colors.END}")
-                print("-"*30)
-                print()
-                die(0)
+def launch_wt():
+    run('start steam://rungameid/236390', shell=True)
 
-if __name__ == "__main__":
-    main()
+def delete_language_file():
+    if not helpers.validate_lang_file(app.storage.general['game_path']):
+        return
+    
+    rmtree(f'{app.storage.general['game_path']}\\lang')
+    ui.notify('Removed language file. Start the game to regenerate it!', type='info')
+    update_stepper()
+
+# --== ACTUAL WEBPAGE SETUP ==--
+
+# Header
+with ui.header(bordered=True):
+    ui.label('War Thunder translation editor').classes('uppercase text-2xl self-center')
+    ui.badge(__version__, color='secondary').classes('text-md self-center')
+    ui.space()
+    ui.button(on_click=toggle_dark_theme, icon='light_mode', color='secondary').bind_visibility_from(dark, 'value', value=True)
+    ui.button(on_click=toggle_dark_theme, icon='dark_mode', color='secondary').bind_visibility_from(dark, 'value', value=False)
+
+# Config
+with ui.expansion('Configuration', icon='build', group='group', value=True).classes('w-full border'):
+    with ui.splitter().classes("w-full") as splitter:
+        with splitter.before:
+            with ui.row().classes('w-full'):
+                ui.input('Game location', placeholder='C:/Path/To/Your/Game', validation=helpers.validate_game_path).bind_value(app.storage.general, 'game_path').classes("w-3/5").disable()
+                ui.button(icon='auto_fix_high', on_click=try_find_game).tooltip('Try to find the game automagically').classes('self-center')
+                ui.button(icon='folder', on_click=file_picker.open).tooltip('Open file picker').classes('self-center')
+
+            with ui.row().classes('w-full'):
+                ui.button('Launch War Thunder', icon='sports_esports', on_click=launch_wt).tooltip('only works with the steam version')
+                ui.button('Reset language files', icon='delete', color='red', on_click=delete_language_file).tooltip('Deletes the \'lang\' folder to force the game to re-create it')
+            
+        with splitter.after:
+            with ui.stepper().props('vertical').classes('w-full') as stepper:
+                config_stepper = stepper
+                with ui.step('locate', title='Find game', icon='search'):
+                    ui.label('Locate the game files')
+                with ui.step('config', title='Check game config', icon='build'):
+                    ui.label('Your config is not set up correctly')
+                    with ui.stepper_navigation():
+                        ui.button('Fix it', on_click=try_update_game_config)
+                with ui.step('lang', title='Find language file', icon='description'):
+                    ui.label('You\'ll have to launch the game once to generate the language file.')
+                    with ui.stepper_navigation():
+                        ui.button(icon='refresh', on_click=update_stepper).tooltip('Click this after closing the game again')
+                with ui.step('done', title="Done!", icon='done'):
+                    pass
+
+update_stepper()
+
+with ui.expansion('Common GUI', icon="language", group='group').classes('w-full border'):
+    editor.Editor(f'{app.storage.general['game_path']}\\lang\\menu.csv')
+
+with ui.expansion('Unit Names', icon="language", group='group').classes('w-full border'):
+    editor.Editor(f'{app.storage.general['game_path']}\\lang\\units.csv')
+
+# Change reload and native to debug in browser
+ui.run(title="Translation Editor", reload=False, native=True, window_size=(1200, 800))
