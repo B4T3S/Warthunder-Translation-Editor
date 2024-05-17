@@ -13,7 +13,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-
+    
     - name: Install dependencies
       run: make setup
 
@@ -21,7 +21,7 @@ jobs:
       run: make build
     
     - uses: actions/upload-artifact@v4
-    - name: "Upload artifacts"
+      name: "Upload artifacts"
       with:
         name: Windows-x64
         path: dist
