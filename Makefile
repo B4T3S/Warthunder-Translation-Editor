@@ -22,7 +22,7 @@ build: # Builds a ready to use .EXE
 setup-runner: # Sets up a .venv and installs all needed packages
 	python -m venv .venv
 	./.venv/bin/activate
-	make install
+	make install-runner
 
 .PHONY: install-runner
 install-runner: # Runs pip install
