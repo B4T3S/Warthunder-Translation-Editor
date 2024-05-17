@@ -19,12 +19,9 @@ jobs:
       with:
         python-version: '3.12.x'
         architecture: 'x64'
-
-    - name: Debug
-      run: ls -la
     
     - name: Install dependencies
-      run: make setup
+      run: python -m venv .venv && ls -la && make install
 
     - name: Run build
       run: make build
