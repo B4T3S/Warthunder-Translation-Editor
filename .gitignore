@@ -165,3 +165,6 @@ config.yml
 
 # Ignore local niceGUI storage
 .nicegui
+
+# Ignore local .dev file
+.dev

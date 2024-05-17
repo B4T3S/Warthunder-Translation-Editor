@@ -1,47 +1,47 @@
 from nicegui import ui, app
+from scripts.storage import StorageInterface
+from os.path import exists
 import pandas as pd
 
 
 class Editor():
+    storage = None
     parent = None
     table: pd.DataFrame = None
     ui_table = None
     lang_select = None
     filter_input = None
-    file_path = None
+    file_name = None
     edit_dialog = None
-    changes = {}
 
-    def __init__(self, file_path):
-        self.file_path = file_path
+    def __init__(self, storage: StorageInterface, filename: str):
+        self.storage = storage
+        self.file_name = filename
         self.parent = ui.row().classes('w-full max-w-full')
         with self.parent:
             self.lang_select = ui.select([], label='Language', on_change=self._draw_table).classes('w-full')
             self.lang_select.disable()
             self.filter_input = ui.input('Filter', placeholder='Search for something to replace...').classes('w-full')
-            with ui.row().classes('w-full'):
-                ui.button('Load translation file', on_click=self.open_table, icon='upload').classes('w-[49%]').bind_enabled_from(self, 'ui_table', backward=lambda x: x == None)
-                ui.button('Save translation file', on_click=self.save_table, icon='download', color='positive').classes('w-[49%]').bind_enabled_from(self, 'ui_table')
+            # with ui.row().classes('w-full'):
+            with ui.grid(columns=3).classes('w-full'):
+                ui.button('Load translation file', on_click=self.open_table, icon='upload').bind_enabled_from(self, 'ui_table', backward=lambda x: x == None)
+                ui.button('Close without saving', on_click=self.close_table, icon='close', color='negative').bind_enabled_from(self, 'ui_table')
+                ui.button('Save translation file', on_click=self.save_table, icon='download', color='positive').bind_enabled_from(self, 'ui_table')
         self.edit_dialog = ui.dialog()
 
     def _edit_cell(self, key):
         currentText = self.table.loc[key, self.lang_select.value]
         def _reset_cell():
-            if key in self.changes.keys():
-                self.table.loc[key, self.lang_select.value] = self.changes[key]['original']
-                self.changes.pop(key)
+            orig = self.storage.get_translation(key, self.lang_select.value, self.file_name)
+            if orig != None:
+                self.table.loc[key, self.lang_select.value] = orig[3]
+                self.storage.remove_translation(key, self.lang_select.value, self.file_name)
                 self._draw_table()
             self.edit_dialog.close()
             
         def _save_cell():
             if inp.value != currentText:
-                if key not in self.changes.keys():
-                    self.changes[key] = {
-                        'original': currentText,
-                        'updated': inp.value
-                    }
-                else:
-                    self.changes[key]['updated'] = inp.value
+                self.storage.set_translation(key, self.lang_select.value, self.file_name, currentText, inp.value)
                 self.table.loc[key, self.lang_select.value] = inp.value
             self.edit_dialog.close()
             self._draw_table()
@@ -57,7 +57,15 @@ class Editor():
                 ui.button('Save', color='positive', on_click=_save_cell)
 
         self.edit_dialog.open()
+    
+    def _load_table(self):
+        path = f'{self.storage.get_config('game_path')}\\lang\\{self.file_name}'
+        if path == None or not exists(path):
+            return False
         
+        self.table = pd.read_csv(open(path, 'r', encoding="utf8"), sep=';')
+        self.table.set_index('<ID|readonly|noverify>', drop=False, inplace=True)
+        return True
 
     def _draw_table(self):
         if not self.lang_select.enabled:
@@ -94,14 +102,9 @@ class Editor():
         pass
 
     def open_table(self):
-        if self.file_path == None:
+        if not self._load_table():
             return
-
-        self.table = pd.read_csv(open(self.file_path, 'r', encoding="utf8"), sep=';')
-        self.table.set_index('<ID|readonly|noverify>', drop=False, inplace=True)
         languages = self.table.columns[1:-2].to_list()
-        if 'changes' in app.storage.general.keys() and self.file_path in app.storage.general['changes'].keys():
-            self.changes = app.storage.general['changes'][self.file_path]
         self.lang_select.set_options(languages)
         if self.lang_select.value == None:
             self.lang_select.value = languages[0]
@@ -109,14 +112,34 @@ class Editor():
         self._draw_table()
     
     def save_table(self):
-        if not 'changes' in app.storage.general.keys():
-            app.storage.general['changes'] = {}    
-        app.storage.general['changes'][self.file_path] = self.changes
-        self.table.to_csv(open(self.file_path, 'w', encoding="utf8"), encoding="utf8", sep=';', index=False, lineterminator='\n')
+        self.table.to_csv(open(f'{self.storage.get_config('game_path')}\\lang\\{self.file_name}', 'w', encoding="utf8"), encoding="utf8", sep=';', index=False, lineterminator='\n')
+        self.storage.save()
+        self.close_table()
+
+    def close_table(self):
         self.table = None
         if self.ui_table != None:
             self.ui_table.delete()
             self.ui_table = None
     
+    def reapply(self):
+        if not self._load_table():
+            return
+
+        translations = self.storage.get_translations_for_file(self.file_name)
+        if translations == None:
+            return
+        
+        if len(translations) == 0:
+            ui.notify(f'No changes saved for {self.file_name}!', type='info')
+            return
+
+        for trans in translations:
+            self.table.loc[trans[0], trans[1]] = trans[4]
+        
+        self.save_table()
+        ui.notify(f'Made {len(translations)} changes in "{self.file_name}"!', type='positive')
+
+
     def move(self, new_parent):
         self.parent.move(new_parent)
