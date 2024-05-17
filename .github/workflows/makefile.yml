@@ -19,6 +19,9 @@ jobs:
       with:
         python-version: '3.12.x'
         architecture: 'x64'
+
+    - name: Debug
+      run: ls
     
     - name: Install dependencies
       run: make setup
