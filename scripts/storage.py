@@ -39,10 +39,11 @@ class StorageInterface():
                 PRIMARY KEY (key, language, filename)
             );
         """)
-        self.save()
+        cur.close()
         version = self.get_config('version')
         if version == None:
             self.set_config('version', __version__)
+        self.save()
 
     def get_config(self, key: str, default = None):
         cur = self._database.cursor()
