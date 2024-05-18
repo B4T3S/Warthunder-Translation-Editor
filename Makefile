@@ -16,12 +16,4 @@ install: # Runs pip install
 
 .PHONY: build
 build: # Builds a ready to use .EXE
-	.venv\Scripts\pyinstaller main.py -F -n War\ Thunder\ translation\ editor --add-data .venv/Lib/site-packages/nicegui:nicegui --add-data .venv/Lib/site-packages/webview:webview
-
-.PHONY: runner
-runner: # Executes all runner commands
-	python -m venv .venv
-	chmod +x .venv/bin -R
-	./.venv/bin/activate
-	./.venv/bin/pip install -r requirements.txt
-	./.venv/bin/pyinstaller main.py -F -w -n War\ Thunder\ translation\ editor --add-data .venv/lib/python3.12/site-packages/nicegui:nicegui --add-data .venv/lib/python3.12/site-packages/webview:webview
+	.venv\Scripts\pyinstaller main.py -F -n War\ Thunder\ translation\ editor --add-data .venv/Lib/site-packages/nicegui:nicegui --add-data .venv/Lib/site-packages/webview:webview --splash images/splash.png

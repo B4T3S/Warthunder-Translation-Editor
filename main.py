@@ -127,6 +127,11 @@ with ui.expansion('Common GUI', icon="language", group='group').classes('w-full 
 with ui.expansion('Unit Names', icon="language", group='group').classes('w-full border'):
     editors.append(editor.Editor(storage, 'units.csv'))
 
+try:
+    import pyi_splash
+    pyi_splash.close()
+except: pass  # If we run into this, we're running outside of a pyinstaller bundle... just ignore the exception and move on
+
 # If a file called .dev exists next to us, run in the browser with hot-reload enabled.
 if path.exists('./.dev'):
     ui.run(title="Translation Editor")
