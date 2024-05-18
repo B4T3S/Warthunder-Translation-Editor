@@ -5,7 +5,7 @@ a = Analysis(
     ['main.py'],
     pathex=[],
     binaries=[],
-    datas=[('c:\hostedtoolcache\windows\python\3.12.3\x64\lib\site-packages\nicegui', 'nicegui'), ('c:\hostedtoolcache\windows\python\3.12.3\x64\lib\site-packages\webview', 'webview')],
+    datas=[('c:\\hostedtoolcache\\windows\\python\\3.12.3\\x64\\lib\\site-packages\\nicegui', 'nicegui'), ('c:\\hostedtoolcache\\windows\\python\\3.12.3\\x64\\lib\\site-packages\\webview', 'webview')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
