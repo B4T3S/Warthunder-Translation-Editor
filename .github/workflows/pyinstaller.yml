@@ -15,4 +15,4 @@ jobs:
           spec: "main.py"
           requirements: "requirements.txt"
           upload_exe_with_name: "War Thunder Translation Editor"
-          options: --onefile, --name "War Thunder Translation Editor", --windowed, --collect-data nicegui, --collect-data webview
+          options: --onefile, --name "War Thunder Translation Editor", --windowed, --collect-data nicegui, --collect-data webview, --splash images/splash.png
