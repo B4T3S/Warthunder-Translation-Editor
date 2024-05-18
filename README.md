@@ -19,7 +19,7 @@ Want to rename a tank? Change the kill message to `BONK`? Maybe replace the word
 
 That's simple!
 
-1. Grab the [latest release](github.com/B4T3S/Warthunder-Translation-Editor/releases/)
+1. Grab the [latest release](https://github.com/B4T3S/Warthunder-Translation-Editor/releases/)
 2. Open the executable you downloaded
 3. That's it!
 
