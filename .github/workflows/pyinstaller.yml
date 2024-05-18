@@ -11,7 +11,7 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Create Executable
-        uses: B4T3S/pyinstaller-action@92678d2
+        uses: B4T3S/pyinstaller-action@92678d2679a2a96aa1f0d2c34d9734e966edb058
         with:
           python_ver: "3.12.3"
           spec: "main.py"
