@@ -15,6 +15,10 @@ A tool to change translations within war thunder.
 As the title states. This tool is used to change translations within war thunder!<br>
 Want to rename a tank? Change the kill message to `BONK`? Maybe replace the word `Exit` with `Ragequit!`? Well then this is the tool for you!
 
+> [!NOTE]
+> Please keep in mind this tool is still in development and might have a couple bugs!
+> If you see something that seems broken or unclear, please open an issue!
+
 ## Where can I get a file I can run?
 
 That's simple!
