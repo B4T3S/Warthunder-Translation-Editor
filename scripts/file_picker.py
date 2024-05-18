@@ -40,8 +40,8 @@ class local_file_picker(ui.dialog):
 
     def add_drives_toggle(self):
         if platform.system() == 'Windows':
-            import win32api
-            drives = win32api.GetLogicalDriveStrings().split('\000')[:-1]
+            from os import listdrives
+            drives = listdrives()
             self.drives_toggle = ui.toggle(drives, value=drives[0], on_change=self.update_drive)
 
     def update_drive(self):

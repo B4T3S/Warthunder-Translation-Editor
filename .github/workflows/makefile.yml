@@ -19,11 +19,8 @@ jobs:
           python-version: "3.12.x"
           architecture: "x64"
 
-      - name: Install dependencies
-        run: make setup-runner
-
       - name: Run build
-        run: make build-runner
+        run: make runner
 
       - uses: actions/upload-artifact@v4
         name: "Upload artifacts"

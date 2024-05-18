@@ -18,16 +18,10 @@ install: # Runs pip install
 build: # Builds a ready to use .EXE
 	.venv\Scripts\pyinstaller main.py -F -n War\ Thunder\ translation\ editor --add-data .venv/Lib/site-packages/nicegui:nicegui --add-data .venv/Lib/site-packages/webview:webview
 
-.PHONY: setup-runner
-setup-runner: # Sets up a .venv and installs all needed packages
+.PHONY: runner
+runner: # Executes all runner commands
 	python -m venv .venv
+	chmod +x .venv/bin -R
 	./.venv/bin/activate
-	make install-runner
-
-.PHONY: install-runner
-install-runner: # Runs pip install
 	./.venv/bin/pip install -r requirements.txt
-
-.PHONY: build-runner
-build-runner: # Builds a ready to use .EXE
-	./.venv/bin/pyinstaller main.py -F -w -n War\ Thunder\ translation\ editor --add-data .venv/Lib/site-packages/nicegui:nicegui --add-data .venv/Lib/site-packages/webview:webview
+	./.venv/bin/pyinstaller main.py -F -w -n War\ Thunder\ translation\ editor --add-data .venv/lib/python3.12/site-packages/nicegui:nicegui --add-data .venv/lib/python3.12/site-packages/webview:webview

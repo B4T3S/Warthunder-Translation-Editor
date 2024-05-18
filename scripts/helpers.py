@@ -14,8 +14,8 @@ def find_game():
     if not is_windows():
         return None
     
-    import win32api
-    drives = win32api.GetLogicalDriveStrings().split('\000')[:-1]
+    from os import listdrives
+    drives = listdrives()
 
     for drive in drives:
         letter = drive[0]
