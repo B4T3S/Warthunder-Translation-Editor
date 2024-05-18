@@ -3,6 +3,8 @@ name: Create release
 on:
   push:
     branches: ["main"]
+  workflow_dispatch:
+    branches: ["dev", "main"]
 
 jobs:
   pyinstaller-build:
