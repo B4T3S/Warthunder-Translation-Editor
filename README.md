@@ -27,12 +27,11 @@ That's simple!
 2. Open the executable you downloaded
 3. That's it!
 
-And if you don't want to run a random executable from the internet:
+And if you don't want to run a random executable from the internet you can (after cloning this repo):
 
-1. Clone this repo
-2. Run `make setup` to create a python venv and install all requirements
-3. Run `main.py` with your IDE or from your console to start a browser version of this app
-4. Alternatively run `make build` to create an executable yourself!
+1. Run `make setup` to create a python venv and install all requirements
+2. Run `make dev` to start a browser version of this app with hot-reloading enabled
+3. Alternatively run `make build` to create an executable yourself!
 
 ## License
 
