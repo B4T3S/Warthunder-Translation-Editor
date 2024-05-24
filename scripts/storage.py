@@ -3,8 +3,8 @@ from os import getenv, mkdir, path
 from semver import Version
 from time import time
 from requests import get
-from urllib import request
 from nicegui import ui
+from webbrowser import open as openweb
 from _version import __version__
 
 
@@ -53,7 +53,7 @@ class StorageInterface():
         self.save()
 
     def _check_for_updates(self):
-        last_check = float(self.get_config('last_update_check'))
+        last_check = float(self.get_config('last_update_check', 0))
         if last_check != None and time() < last_check + (60 * 5):  # Only allow an update check every 5 minutes.
             print("Skipping check!")
             return
@@ -84,7 +84,7 @@ class StorageInterface():
                         ui.icon('east')
                         ui.badge(versions[0]['name'], color='positive')
                     with ui.row():
-                        ui.button('Download', on_click=lambda: request.urlopen('https://github.com/B4T3S/Warthunder-Translation-Editor/releases'), color='positive', icon='download')
+                        ui.button('Download', on_click=lambda: openweb('https://github.com/B4T3S/Warthunder-Translation-Editor/releases'), color='positive', icon='download')
                         ui.button('Skip for now', on_click=diag.close, color='gray')
                 diag.open()
 
