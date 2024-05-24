@@ -2,6 +2,7 @@ import pandas as pd
 from nicegui import app, ui
 from scripts import file_picker as fp, helpers, editor, storage
 from os import path
+from sys import argv
 from shutil import rmtree
 from subprocess import run
 from _version import __version__
@@ -133,7 +134,7 @@ try:
 except: pass  # If we run into this, we're running outside of a pyinstaller bundle... just ignore the exception and move on
 
 # If a file called .dev exists next to us, run in the browser with hot-reload enabled.
-if path.exists('./.dev'):
+if '--dev' in argv:
     ui.run(title="Translation Editor")
 else:  # Otherwise run natively and without hot reload
     ui.run(title="Translation Editor", reload=False, native=True, window_size=(1200, 800))
