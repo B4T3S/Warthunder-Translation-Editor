@@ -1,5 +1,6 @@
 import sqlite3
 from os import getenv, mkdir, path
+from semver import Version
 from _version import __version__
 
 
@@ -41,7 +42,8 @@ class StorageInterface():
         """)
         cur.close()
         version = self.get_config('version')
-        if version == None:
+        # TODO: If compare returns 1, an update was installed. Check for DB updates?
+        if version == None or Version.parse(__version__[1:]).compare(version[1:]) == 1:
             self.set_config('version', __version__)
         self.save()
 
