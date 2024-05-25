@@ -150,6 +150,9 @@ with ui.expansion('Common GUI', icon="language", group='group').classes('w-full 
 with ui.expansion('Unit Names', icon="language", group='group').classes('w-full border'):
     editors.append(editor.Editor(storage, 'units.csv', logger))
 
+with ui.expansion('Weapon and Ammo Names', icon="language", group='group').classes('w-full border'):
+    editors.append(editor.Editor(storage, 'units_weaponry.csv', logger))
+
 try:
     import pyi_splash
     pyi_splash.close()
