@@ -7,6 +7,10 @@ A tool to change translations within war thunder.
 [![Build](https://github.com/B4T3S/Warthunder-Translation-Editor/actions/workflows/pyinstaller.yml/badge.svg)](https://github.com/B4T3S/Warthunder-Translation-Editor/actions/workflows/pyinstaller.yml)
 [![GitHub tag](https://img.shields.io/github/tag/B4T3S/Warthunder-Translation-Editor?include_prereleases=&sort=semver&color=blue)](https://github.com/B4T3S/Warthunder-Translation-Editor/releases/)
 [![License](https://img.shields.io/badge/License-MIT-blue)](#license)
+<br/>
+<a href="https://discord.gg/6qd3SkP6Ch" target="_blank"><img src="https://img.shields.io/discord/931137677695266856?label=Support Server&logo=Discord"></img></a>
+<a href="https://www.paypal.com/paypalme/floriancegledi" target="_blank"><img src="https://img.shields.io/badge/PayPal-Support%20me%3F-blue"></img></a>
+<a href="https://www.patreon.com/bates" target="_blank"><img src="https://img.shields.io/badge/Patreon-Support%20me%3F-f96854"></img></a>
 
 </div>
 
@@ -27,12 +31,11 @@ That's simple!
 2. Open the executable you downloaded
 3. That's it!
 
-And if you don't want to run a random executable from the internet:
+And if you don't want to run a random executable from the internet you can (after cloning this repo):
 
-1. Clone this repo
-2. Run `make setup` to create a python venv and install all requirements
-3. Run `main.py` with your IDE or from your console to start a browser version of this app
-4. Alternatively run `make build` to create an executable yourself!
+1. Run `make setup` to create a python venv and install all requirements
+2. Run `make dev` to start a browser version of this app with hot-reloading enabled
+3. Alternatively run `make build` to create an executable yourself!
 
 ## License
 

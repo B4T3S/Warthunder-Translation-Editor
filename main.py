@@ -1,16 +1,35 @@
 import pandas as pd
+import logging
 from nicegui import app, ui
 from scripts import file_picker as fp, helpers, editor, storage
-from os import path
+from os import path, getenv
+from sys import argv
 from shutil import rmtree
 from subprocess import run
 from _version import __version__
+
+# --== SET UP LOGGING ==--
+logFormatter = logging.Formatter('%(relativeCreated)d [%(levelname)s] - %(message)s')
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG if '--verbose' in argv else logging.INFO)
+
+fh = logging.FileHandler(f'{getenv('LOCALAPPDATA')}/War Thunder Translation Editor/logs.txt', mode='w')
+fh.setFormatter(logFormatter)
+fh.setLevel(logging.DEBUG if '--verbose' in argv else logging.INFO)
+logger.addHandler(fh)
+
+sh = logging.StreamHandler()
+sh.setFormatter(logFormatter)
+logger.addHandler(sh)
+
+logger.info('STARTING')
+logger.info(f'Version {__version__}')
 
 # --== SET UP VARIABLES ==--
 file_picker = fp.local_file_picker('C:/', multiple=False)
 translations = None
 editors = []
-storage = storage.StorageInterface()
+storage = storage.StorageInterface(logger)
 dark = ui.dark_mode()
 dark.value = int(storage.get_config('darkmode', 0)) == 1
 
@@ -19,6 +38,7 @@ dark.value = int(storage.get_config('darkmode', 0)) == 1
 def toggle_dark_theme():
     dark.toggle()
     storage.set_config('darkmode', dark.value)
+    logger.info('Toggling darkmode. New value: ' + dark.value)
 
 def set_game_path(path: str):
     if type(path) is list:  # The manual file picker gives back a list with one entry, so we just do this.
@@ -27,10 +47,12 @@ def set_game_path(path: str):
     location_input.value = path
     file_picker.close()
     update_stepper()
+    logger.info('Updating game path: ' + path)
 
 file_picker.submit = set_game_path
 
 def try_find_game():
+    logger.info('Trying to find game automatically')
     path = helpers.find_game()
     if path is not None:
         set_game_path(path)
@@ -60,8 +82,10 @@ def update_stepper():
         reapply_button.enable()
 
 def try_update_game_config():
+    logger.info('Updating game config...')
     if helpers.update_game_config(storage.get_config('game_path')):
         ui.notify('Updated game config', type='positive')
+        logger.info('Updated game config!')
     update_stepper()
 
 def delete_language_file():
@@ -122,10 +146,13 @@ with ui.expansion('Configuration', icon='build', group='group', value=True).clas
 update_stepper()
 
 with ui.expansion('Common GUI', icon="language", group='group').classes('w-full border'):
-    editors.append(editor.Editor(storage, 'menu.csv'))
+    editors.append(editor.Editor(storage, 'menu.csv', logger))
 
 with ui.expansion('Unit Names', icon="language", group='group').classes('w-full border'):
-    editors.append(editor.Editor(storage, 'units.csv'))
+    editors.append(editor.Editor(storage, 'units.csv', logger))
+
+with ui.expansion('Weapon and Ammo Names', icon="language", group='group').classes('w-full border'):
+    editors.append(editor.Editor(storage, 'units_weaponry.csv', logger))
 
 try:
     import pyi_splash
@@ -133,7 +160,7 @@ try:
 except: pass  # If we run into this, we're running outside of a pyinstaller bundle... just ignore the exception and move on
 
 # If a file called .dev exists next to us, run in the browser with hot-reload enabled.
-if path.exists('./.dev'):
+if '--dev' in argv:
     ui.run(title="Translation Editor")
 else:  # Otherwise run natively and without hot reload
     ui.run(title="Translation Editor", reload=False, native=True, window_size=(1200, 800))
