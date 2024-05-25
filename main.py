@@ -1,7 +1,8 @@
 import pandas as pd
+import logging
 from nicegui import app, ui
 from scripts import file_picker as fp, helpers, editor, storage
-from os import path
+from os import path, getenv
 from sys import argv
 from shutil import rmtree
 from subprocess import run
@@ -15,11 +16,28 @@ storage = storage.StorageInterface()
 dark = ui.dark_mode()
 dark.value = int(storage.get_config('darkmode', 0)) == 1
 
+# --== SET UP LOGGING ==--
+logFormatter = logging.Formatter('%(relativeCreated)d [%(levelname)s] - %(message)s')
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG if '--verbose' in argv else logging.INFO)
+
+fh = logging.FileHandler(f'{getenv('LOCALAPPDATA')}/War Thunder Translation Editor/logs.txt', mode='w')
+fh.setFormatter(logFormatter)
+logger.addHandler(fh)
+
+sh = logging.StreamHandler()
+sh.setFormatter(logFormatter)
+logger.addHandler(sh)
+
+logger.info('STARTING')
+logger.info(f'Version {__version__}')
+
 # --== FUNCTIONS ==--
 
 def toggle_dark_theme():
     dark.toggle()
     storage.set_config('darkmode', dark.value)
+    logger.info('Toggling darkmode. New value: ' + dark.value)
 
 def set_game_path(path: str):
     if type(path) is list:  # The manual file picker gives back a list with one entry, so we just do this.
@@ -28,10 +46,12 @@ def set_game_path(path: str):
     location_input.value = path
     file_picker.close()
     update_stepper()
+    logger.info('Updating game path: ' + path)
 
 file_picker.submit = set_game_path
 
 def try_find_game():
+    logger.info('Trying to find game automatically')
     path = helpers.find_game()
     if path is not None:
         set_game_path(path)
@@ -61,8 +81,10 @@ def update_stepper():
         reapply_button.enable()
 
 def try_update_game_config():
+    logger.info('Updating game config...')
     if helpers.update_game_config(storage.get_config('game_path')):
         ui.notify('Updated game config', type='positive')
+        logger.info('Updated game config!')
     update_stepper()
 
 def delete_language_file():
@@ -123,10 +145,10 @@ with ui.expansion('Configuration', icon='build', group='group', value=True).clas
 update_stepper()
 
 with ui.expansion('Common GUI', icon="language", group='group').classes('w-full border'):
-    editors.append(editor.Editor(storage, 'menu.csv'))
+    editors.append(editor.Editor(storage, 'menu.csv', logger))
 
 with ui.expansion('Unit Names', icon="language", group='group').classes('w-full border'):
-    editors.append(editor.Editor(storage, 'units.csv'))
+    editors.append(editor.Editor(storage, 'units.csv', logger))
 
 try:
     import pyi_splash

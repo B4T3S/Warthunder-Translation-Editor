@@ -20,4 +20,4 @@ build: # Builds a ready to use .EXE
 
 .PHONY: dev
 dev: # Starts the app in development mode (in browser with hot-reloading)
-	.venv\Scripts\python main.py --dev
+	.venv\Scripts\python main.py --dev --verbose
