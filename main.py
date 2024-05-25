@@ -8,14 +8,6 @@ from shutil import rmtree
 from subprocess import run
 from _version import __version__
 
-# --== SET UP VARIABLES ==--
-file_picker = fp.local_file_picker('C:/', multiple=False)
-translations = None
-editors = []
-storage = storage.StorageInterface()
-dark = ui.dark_mode()
-dark.value = int(storage.get_config('darkmode', 0)) == 1
-
 # --== SET UP LOGGING ==--
 logFormatter = logging.Formatter('%(relativeCreated)d [%(levelname)s] - %(message)s')
 logger = logging.getLogger(__name__)
@@ -31,6 +23,14 @@ logger.addHandler(sh)
 
 logger.info('STARTING')
 logger.info(f'Version {__version__}')
+
+# --== SET UP VARIABLES ==--
+file_picker = fp.local_file_picker('C:/', multiple=False)
+translations = None
+editors = []
+storage = storage.StorageInterface(logger)
+dark = ui.dark_mode()
+dark.value = int(storage.get_config('darkmode', 0)) == 1
 
 # --== FUNCTIONS ==--
 
