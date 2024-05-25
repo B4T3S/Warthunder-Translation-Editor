@@ -15,6 +15,7 @@ logger.setLevel(logging.DEBUG if '--verbose' in argv else logging.INFO)
 
 fh = logging.FileHandler(f'{getenv('LOCALAPPDATA')}/War Thunder Translation Editor/logs.txt', mode='w')
 fh.setFormatter(logFormatter)
+fh.setLevel(logging.DEBUG if '--verbose' in argv else logging.INFO)
 logger.addHandler(fh)
 
 sh = logging.StreamHandler()
