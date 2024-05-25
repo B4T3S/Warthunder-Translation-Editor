@@ -16,8 +16,8 @@ class Editor():
     edit_dialog = None
 
     def __init__(self, storage: StorageInterface, filename: str, logger):
-        logger.debug('Initializing editor for ' + filename)
         self.logger = logger
+        self.logger.debug('Initializing editor for ' + filename)
         self.storage = storage
         self.file_name = filename
         self.parent = ui.row().classes('w-full max-w-full')
@@ -33,10 +33,10 @@ class Editor():
         self.edit_dialog = ui.dialog()
 
     def _edit_cell(self, key):
-        logger.debug(f'Starting edit on cell ID: {key} LANG: {self.lang_select.value}')
+        self.logger.debug(f'Starting edit on cell ID: {key} LANG: {self.lang_select.value}')
         currentText = self.table.loc[key, self.lang_select.value]
         def _reset_cell():
-            logger.debug(f'Resetting cell ID {key} for LANG {self.lang_select.value}')
+            self.logger.debug(f'Resetting cell ID {key} for LANG {self.lang_select.value}')
             orig = self.storage.get_translation(key, self.lang_select.value, self.file_name)
             if orig != None:
                 self.table.loc[key, self.lang_select.value] = orig[3]
@@ -45,7 +45,7 @@ class Editor():
             self.edit_dialog.close()
             
         def _save_cell():
-            logger.debug(f'Saving cell ID {key} for LANG {self.lang_select.value}')
+            self.logger.debug(f'Saving cell ID {key} for LANG {self.lang_select.value}')
             if inp.value != currentText:
                 self.storage.set_translation(key, self.lang_select.value, self.file_name, currentText, inp.value)
                 self.table.loc[key, self.lang_select.value] = inp.value
@@ -65,7 +65,7 @@ class Editor():
         self.edit_dialog.open()
     
     def _load_table(self):
-        logger.debug(f'Loading file {self.file_name}')
+        self.logger.debug(f'Loading file {self.file_name}')
         path = f'{self.storage.get_config('game_path')}\\lang\\{self.file_name}'
         if path == None or not exists(path):
             return False
@@ -75,7 +75,7 @@ class Editor():
         return True
 
     def _draw_table(self):
-        logger.debug(f'Drawing table for file {self.file_name}')
+        self.logger.debug(f'Drawing table for file {self.file_name}')
         if not self.lang_select.enabled:
             return
 
@@ -110,7 +110,7 @@ class Editor():
         pass
 
     def open_table(self):
-        logger.debug(f'Opening table for file {self.file_name}')
+        self.logger.debug(f'Opening table for file {self.file_name}')
         if not self._load_table():
             return
         languages = self.table.columns[1:-2].to_list()
@@ -121,7 +121,7 @@ class Editor():
         self._draw_table()
     
     def save_table(self):
-        logger.debug(f'Saving file {self.file_name}')
+        self.logger.debug(f'Saving file {self.file_name}')
         self.table.to_csv(open(f'{self.storage.get_config('game_path')}\\lang\\{self.file_name}', 'w', encoding="utf8"), encoding="utf8", sep=';', index=False, lineterminator='\n')
         self.storage.save()
         self.close_table()
@@ -133,7 +133,7 @@ class Editor():
             self.ui_table = None
     
     def reapply(self):
-        logger.debug(f'Reapplying all changes for file {self.file_name}')
+        self.logger.debug(f'Reapplying all changes for file {self.file_name}')
         if not self._load_table():
             return
 
@@ -142,7 +142,7 @@ class Editor():
             return
         
         if len(translations) == 0:
-            logger.debug(f'No changes found. Aborting!')
+            self.logger.debug(f'No changes found. Aborting!')
             ui.notify(f'No changes saved for {self.file_name}!', type='info')
             return
 
