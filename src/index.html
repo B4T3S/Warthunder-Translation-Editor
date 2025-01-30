@@ -3,14 +3,73 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Bootstrap w/ Parcel</title>
+    <title>Warthunder translation editor</title>
     <link rel="stylesheet" href="scss/main.scss">
     <script type="module" src="js/main.js"></script>
   </head>
-  <body>
+  <body data-bs-theme="dark">
+    <div class="fixed-top vw-100 vh-100 bg-dark d-flex flex-column justify-content-center align-items-center">
+        <h1 class="text-white">Warthunder translation editor</h1>
+        <p class="text-secondary">There's some steps you need to do before you can edit the translations</p>
+        
+        <div class="accordion accordion-flush w-75" id="configAccordion">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="locateGameHeader">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#locateGameCollapse" aria-expanded="true" aria-controls="locateGameCollapse" disabled>
+                        Locate game
+                        <div class="ms-2 spinner-border spinner-border-sm text-secondary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <i class="bi bi-check-lg text-success" hidden></i>
+                        <i class="bi bi-x-lg text-danger" hidden></i>
+                    </button>
+                </h2>
+                <div id="locateGameCollapse" class="accordion-collapse collapse show" aria-labelledby="locateGameHeader" data-bs-parent="#configAccordion">
+                    <div class="accordion-body">
+                        <p>Locate the game folder</p>
+                        <div class="input-group mb-3">
+                            <input type="text" class="form-control" placeholder="Path to game folder" aria-label="Path to game folder" aria-describedby="locateGameButton" readonly>
+                            <button class="btn btn-outline-secondary" type="button" id="folderPicker">Locate</button>
+                        </div>
+                        <p class="text-danger" id="wrongGamePath" hidden>Couldn't find the config.blk file in this directory! This is probably not the right folder!</p>
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="checkConfigHeader">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#checkConfigCollapse" aria-expanded="false" aria-controls="checkConfigCollapse" disabled>
+                        Check configuration
+                        <div class="ms-2 spinner-border spinner-border-sm text-secondary" role="status" hidden>
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <i class="bi bi-check-lg text-success" hidden></i>
+                        <i class="bi bi-x-lg text-danger" hidden></i>
+                    </button>
+                </h2>
+                <div id="checkConfigCollapse" class="accordion-collapse collapse" aria-labelledby="checkConfigHeader" data-bs-parent="#configAccordion">
+                    <div class="accordion-body">
+                        <p id="checkConfigText">Checking whether or not you have text-debugging enabled...</p>
+                        <p id="checkConfigTextSuccess" hidden>The game is configured correctly!</p>
+                        <p id="checkConfigTextFail" hidden>The game is not configured correctly! <button class="btn btn-primary" id="updateConfigButton">Fix it!</button></p>
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="checkFilesHeader">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#checkContentCollapse" aria-expanded="false" aria-controls="checkContentCollapse" disabled>
+                        Check for files
+                    </button>
+                </h2>
+                <div id="checkContentCollapse" class="accordion-collapse collapse" aria-labelledby="checkFilesHeader" data-bs-parent="#configAccordion">
+                    <div class="accordion-body">
+                        <!-- Content for Check for files -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="container py-4 px-3 mx-auto">
-      <h1>Hello, Bootstrap and Parcel!</h1>
-      <button class="btn btn-primary">Primary button</button>
+
     </div>
   </body>
 </html>
