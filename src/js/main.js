@@ -1,44 +1,56 @@
 // Import all of Bootstrap's JS
-import * as bootstrap from 'bootstrap'
+import * as bootstrap from 'bootstrap';
 import $ from "jquery";
+import Papa from 'papaparse';
 
 let gameFiles = {};
+let table = null;
 
-$(folderPicker).on('click', function() {
-    window.showDirectoryPicker({
-        id: 'wtDir', 
-        mode: 'readwrite'
-    }).then(function(directory) {
-        verifyDirectory(directory);
+// SETUP BLOCK
+
+$(document).ready(() => {
+    $(folderPicker).on('click', function() {
+        window.showDirectoryPicker({
+            id: 'wtDir', 
+            mode: 'readwrite'
+        }).then(function(directory) {
+            verifyDirectory(directory);
+        });
     });
-});
-
-$(updateConfigButton).on('click', function() {
-    gameFiles['config.blk'].getFile().then(file => {
-        file.text().then(content => {
-            // Update the configuration file
-            let newContent;
-            const debugRegex = /debug\s*\{[^{}]*\}/;
-            if (debugRegex.test(content)) {
-                newContent = content.replace(debugRegex, match => {
-                    return match.includes('testLocalization:b=yes') ? match : match.replace(/\}$/, '  testLocalization:b=yes\n}');
-                });
-            } else {
-                newContent = content + '\ndebug {\n    testLocalization:b=yes\n}';
-            }
-
-            // Write the new content to the configuration file
-            gameFiles['config.blk'].createWritable().then(writable => {
-                writable.write(newContent).then(() => {
-                    writable.close();
-                    setTimeout(async () => {
-                        verifyConfiguration(await gameFiles['config.blk'].getFile());
-                    }, 500);
+    
+    $(updateConfigButton).on('click', function() {
+        gameFiles['config.blk'].getFile().then(file => {
+            file.text().then(content => {
+                // Update the configuration file
+                let newContent;
+                const debugRegex = /debug\s*\{[^{}]*\}/;
+                if (debugRegex.test(content)) {
+                    newContent = content.replace(debugRegex, match => {
+                        return match.includes('testLocalization:b=yes') ? match : match.replace(/\}$/, '  testLocalization:b=yes\n}');
+                    });
+                } else {
+                    newContent = content + '\ndebug {\n    testLocalization:b=yes\n}';
+                }
+    
+                // Write the new content to the configuration file
+                gameFiles['config.blk'].createWritable().then(writable => {
+                    writable.write(newContent).then(() => {
+                        writable.close();
+                        setTimeout(async () => {
+                            verifyConfiguration(await gameFiles['config.blk'].getFile());
+                        }, 500);
+                    });
                 });
             });
         });
     });
+    
+    $(checkFilesButton).on('click', verifyLangFolderExists);
 });
+
+// END SETUP BLOCK
+
+// CONFIG BLOCK
 
 function verifyDirectory(directory) {
     var entries = {};
@@ -55,7 +67,6 @@ function verifyDirectory(directory) {
             $('#locateGameCollapse input').attr('value', directory.name);
 
             setTimeout(async () => {
-                $('#locateGameHeader > button').attr('disabled', true);
                 $('#checkConfigHeader > button').attr('disabled', false);
                 $('#checkConfigHeader > button').trigger('click');
                 $('#checkConfigHeader > button').attr('disabled', true);
@@ -89,6 +100,9 @@ function verifyConfiguration(configFile) {
                 $('#checkFilesHeader > button').attr('disabled', false);
                 $('#checkFilesHeader > button').trigger('click');
                 $('#checkFilesHeader > button').attr('disabled', true);
+                $('#checkFilesHeader .spinner-border').attr('hidden', false);
+
+                verifyLangFolderExists();
             }, 500);
         } else {
             // Failure, prompt the user to fix the configuration file
@@ -98,6 +112,51 @@ function verifyConfiguration(configFile) {
             $('#checkConfigText').attr('hidden', true);
             $('#checkConfigTextSuccess').attr('hidden', true);
             $('#checkConfigTextFail').attr('hidden', false);
+        }
+    });
+}
+
+function verifyLangFolderExists() {
+    if (gameFiles['lang']?.kind == 'directory') {
+            // Success, show the next step
+            $('#checkFilesHeader .spinner-border').attr('hidden', true);
+            $('#checkFilesHeader .bi-check-lg').attr('hidden', false);
+            $('#checkFilesHeader .bi-x-lg').attr('hidden', true);
+            $('#checkFilesText').attr('hidden', true);
+            $('#checkFilesTextSuccess').attr('hidden', false);
+            $('#checkFilesTextFail').attr('hidden', true);
+
+            setTimeout(async () => {
+                $('#configWindow').attr('style', 'transition-duration: .75s; top: -105vh');
+
+                for await (const entry of gameFiles['lang'].values()) {
+                    if (entry.name == 'menu.csv') {
+                        openCSV(await entry.getFile());
+                    }
+                }
+                
+            }, 500);
+    } else {
+        // Failure, prompt the user to start the game
+        $('#checkFilesHeader .spinner-border').attr('hidden', true);
+        $('#checkFilesHeader .bi-check-lg').attr('hidden', true);
+        $('#checkFilesHeader .bi-x-lg').attr('hidden', false);
+        $('#checkFilesText').attr('hidden', true);
+        $('#checkFilesTextSuccess').attr('hidden', true);
+        $('#checkFilesTextFail').attr('hidden', false);
+    }
+}
+
+// END CONFIG BLOCK
+
+// MAIN BLOCK
+
+function openCSV(file) {
+    Papa.parse(file, {
+        header: true,
+        complete: function(results) {
+            
+            console.log(results);
         }
     });
 }

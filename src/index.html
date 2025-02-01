@@ -8,7 +8,7 @@
     <script type="module" src="js/main.js"></script>
   </head>
   <body data-bs-theme="dark">
-    <div class="fixed-top vw-100 vh-100 bg-dark d-flex flex-column justify-content-center align-items-center">
+    <div id="configWindow" class="fixed-top vw-100 vh-100 bg-dark d-flex flex-column justify-content-center align-items-center shadow-lg">
         <h1 class="text-white">Warthunder translation editor</h1>
         <p class="text-secondary">There's some steps you need to do before you can edit the translations</p>
         
@@ -58,18 +58,27 @@
                 <h2 class="accordion-header" id="checkFilesHeader">
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#checkContentCollapse" aria-expanded="false" aria-controls="checkContentCollapse" disabled>
                         Check for files
+                        <div class="ms-2 spinner-border spinner-border-sm text-secondary" role="status" hidden>
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <i class="bi bi-check-lg text-success" hidden></i>
+                        <i class="bi bi-x-lg text-danger" hidden></i>
                     </button>
                 </h2>
                 <div id="checkContentCollapse" class="accordion-collapse collapse" aria-labelledby="checkFilesHeader" data-bs-parent="#configAccordion">
                     <div class="accordion-body">
-                        <!-- Content for Check for files -->
+                        <p id="checkFilesText">Checking if lang folder is present...</p>
+                        <p id="checkFilesTextSuccess" hidden>Lang folder is present!</p>
+                        <p id="checkFilesTextFail" hidden>Lang folder is not present! Start the game once and wait 10 seconds for the folder to be created. Then close the game again! <button id="checkFilesButton">Re-check</button></p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
     <div class="container py-4 px-3 mx-auto">
-
+        <table id="dataGrid">
+            
+        </table>
     </div>
   </body>
 </html>
