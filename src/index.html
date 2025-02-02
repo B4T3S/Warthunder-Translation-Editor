@@ -8,7 +8,7 @@
     <script type="module" src="js/main.js"></script>
   </head>
   <body data-bs-theme="dark">
-    <div id="configWindow" class="fixed-top vw-100 vh-100 bg-dark d-flex flex-column justify-content-center align-items-center shadow-lg">
+    <div id="configWindow" class="fixed-top vw-100 vh-100 bg-dark d-flex flex-column justify-content-center align-items-center shadow-lg d-none"> <!-- TODO: UNHIDE THIS -->
         <h1 class="text-white">Warthunder translation editor</h1>
         <p class="text-secondary">There's some steps you need to do before you can edit the translations</p>
         
@@ -75,10 +75,17 @@
             </div>
         </div>
     </div>
+
+    <div class="toast align-items-center bg-success position-relative start-50 mt-2 translate-middle-x" role="alert" aria-live="assertive" aria-atomic="true" id="filesLoadedToast">
+        <div class="d-flex">
+            <div class="toast-body">
+                All translation files loaded!
+            </div>
+        </div>
+    </div>
+
     <div class="container py-4 px-3 mx-auto">
-        <table id="dataGrid">
-            
-        </table>
+        >
     </div>
   </body>
 </html>

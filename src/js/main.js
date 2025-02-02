@@ -4,7 +4,7 @@ import $ from "jquery";
 import Papa from 'papaparse';
 
 let gameFiles = {};
-let table = null;
+let langFiles = {};
 
 // SETUP BLOCK
 
@@ -129,11 +129,18 @@ function verifyLangFolderExists() {
             setTimeout(async () => {
                 $('#configWindow').attr('style', 'transition-duration: .75s; top: -105vh');
 
-                for await (const entry of gameFiles['lang'].values()) {
-                    if (entry.name == 'menu.csv') {
-                        openCSV(await entry.getFile());
-                    }
-                }
+                const files = await Array.fromAsync(await gameFiles['lang'].values());
+                const tasks = files.map(async entry => {
+                    return openCSV(await entry.getFile());
+                });
+                
+                Promise.all(tasks).then(() => {
+                    console.log("ALL FILES LOADED!");
+                    bootstrap.Toast.getOrCreateInstance($('#filesLoadedToast'), {
+                        autohide: true,
+                        delay: 3000
+                    }).show();
+                });
                 
             }, 500);
     } else {
@@ -152,11 +159,15 @@ function verifyLangFolderExists() {
 // MAIN BLOCK
 
 function openCSV(file) {
-    Papa.parse(file, {
-        header: true,
-        complete: function(results) {
-            
-            console.log(results);
-        }
+    return new Promise((resolve) => {
+        Papa.parse(file, {
+            header: true,
+            complete: function(results) {
+                console.log("Loaded " + file.name + " with " + results.data.length + " rows");
+                langFiles[file.name] = results;
+
+                resolve();
+            }
+        });
     });
 }
