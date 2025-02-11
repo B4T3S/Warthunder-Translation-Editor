@@ -158,6 +158,20 @@ function verifyLangFolderExists() {
 
 // MAIN BLOCK
 
+class Change {
+    translation_id = "";
+    original = "";
+    changed = "";
+    language = "";
+
+    constructor(translation_id, original, changed, language) {
+        this.translation_id = translation_id;
+        this.original = original;
+        this.changed = changed;
+        this.language = language;
+    }
+}
+
 function openCSV(file) {
     return new Promise((resolve) => {
         Papa.parse(file, {
@@ -171,3 +185,5 @@ function openCSV(file) {
         });
     });
 }
+
+// END MAIN BLOCK
