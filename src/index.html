@@ -1,158 +1,337 @@
 <!doctype html>
 <html lang="en" class="h-100">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Warthunder translation editor</title>
-    <link rel="stylesheet" href="scss/main.scss">
-    <script type="module" src="js/main.js"></script>
-  </head>
-  <body data-bs-theme="dark" class="h-100">
-    <div id="configWindow" class="fixed-top vw-100 vh-100 bg-dark d-flex flex-column justify-content-center align-items-center shadow-lg">
-        <h1 class="text-white">Warthunder translation editor</h1>
-        <p class="text-secondary">There's some steps you need to do before you can edit the translations</p>
-        
-        <div class="accordion accordion-flush w-75" id="configAccordion">
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="locateGameHeader">
-                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#locateGameCollapse" aria-expanded="true" aria-controls="locateGameCollapse" disabled>
-                        Locate game
-                        <div class="ms-2 spinner-border spinner-border-sm text-secondary" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-                        <i class="bi bi-check-lg text-success" hidden></i>
-                        <i class="bi bi-x-lg text-danger" hidden></i>
-                    </button>
-                </h2>
-                <div id="locateGameCollapse" class="accordion-collapse collapse show" aria-labelledby="locateGameHeader" data-bs-parent="#configAccordion">
-                    <div class="accordion-body">
-                        <p>Locate the game folder</p>
-                        <div class="input-group mb-3">
-                            <input type="text" class="form-control" placeholder="Path to game folder" aria-label="Path to game folder" aria-describedby="locateGameButton" readonly>
-                            <button class="btn btn-outline-secondary" type="button" id="folderPicker">Locate</button>
-                        </div>
-                        <p class="text-danger" id="wrongGamePath" hidden>Couldn't find the config.blk file in this directory! This is probably not the right folder!</p>
-                    </div>
-                </div>
-            </div>
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="checkConfigHeader">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#checkConfigCollapse" aria-expanded="false" aria-controls="checkConfigCollapse" disabled>
-                        Check configuration
-                        <div class="ms-2 spinner-border spinner-border-sm text-secondary" role="status" hidden>
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-                        <i class="bi bi-check-lg text-success" hidden></i>
-                        <i class="bi bi-x-lg text-danger" hidden></i>
-                    </button>
-                </h2>
-                <div id="checkConfigCollapse" class="accordion-collapse collapse" aria-labelledby="checkConfigHeader" data-bs-parent="#configAccordion">
-                    <div class="accordion-body">
-                        <p id="checkConfigText">Checking whether or not you have text-debugging enabled...</p>
-                        <p id="checkConfigTextSuccess" hidden>The game is configured correctly!</p>
-                        <p id="checkConfigTextFail" hidden>The game is not configured correctly! <button class="btn btn-primary" id="updateConfigButton">Fix it!</button></p>
-                    </div>
-                </div>
-            </div>
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="checkFilesHeader">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#checkContentCollapse" aria-expanded="false" aria-controls="checkContentCollapse" disabled>
-                        Check for files
-                        <div class="ms-2 spinner-border spinner-border-sm text-secondary" role="status" hidden>
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-                        <i class="bi bi-check-lg text-success" hidden></i>
-                        <i class="bi bi-x-lg text-danger" hidden></i>
-                    </button>
-                </h2>
-                <div id="checkContentCollapse" class="accordion-collapse collapse" aria-labelledby="checkFilesHeader" data-bs-parent="#configAccordion">
-                    <div class="accordion-body">
-                        <p id="checkFilesText">Checking if lang folder is present...</p>
-                        <p id="checkFilesTextSuccess" hidden>Lang folder is present!</p>
-                        <p id="checkFilesTextFail" hidden>Lang folder is not present! Start the game once and wait 10 seconds for the folder to be created. Then close the game again! <button id="checkFilesButton">Re-check</button></p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Warthunder translation editor</title>
+        <link rel="stylesheet" href="scss/main.scss" />
+        <script type="module" src="js/main.js"></script>
+    </head>
+    <body data-bs-theme="dark" class="h-100">
+        <div
+            id="configWindow"
+            class="fixed-top vw-100 vh-100 bg-dark d-flex flex-column justify-content-center align-items-center shadow-lg"
+        >
+            <h1 class="text-white">Warthunder translation editor</h1>
+            <p class="text-secondary">
+                There's some steps you need to do before you can edit the
+                translations
+            </p>
 
-    <div class="toast align-items-center bg-success position-relative start-50 mt-2 translate-middle-x" role="alert" aria-live="assertive" aria-atomic="true" id="filesLoadedToast">
-        <div class="d-flex">
-            <div class="toast-body">
-                All translation files loaded!
+            <div class="accordion accordion-flush w-75" id="configAccordion">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="locateGameHeader">
+                        <button
+                            class="accordion-button"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#locateGameCollapse"
+                            aria-expanded="true"
+                            aria-controls="locateGameCollapse"
+                            disabled
+                        >
+                            Locate game
+                            <div
+                                class="ms-2 spinner-border spinner-border-sm text-secondary"
+                                role="status"
+                            >
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <i class="bi bi-check-lg text-success" hidden></i>
+                            <i class="bi bi-x-lg text-danger" hidden></i>
+                        </button>
+                    </h2>
+                    <div
+                        id="locateGameCollapse"
+                        class="accordion-collapse collapse show"
+                        aria-labelledby="locateGameHeader"
+                        data-bs-parent="#configAccordion"
+                    >
+                        <div class="accordion-body">
+                            <p>Locate the game folder</p>
+                            <div class="input-group mb-3">
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    placeholder="Path to game folder"
+                                    aria-label="Path to game folder"
+                                    aria-describedby="locateGameButton"
+                                    readonly
+                                />
+                                <button
+                                    class="btn btn-outline-secondary"
+                                    type="button"
+                                    id="folderPicker"
+                                >
+                                    Locate
+                                </button>
+                            </div>
+                            <p class="text-danger" id="wrongGamePath" hidden>
+                                Couldn't find the config.blk file in this
+                                directory! This is probably not the right
+                                folder!
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="checkConfigHeader">
+                        <button
+                            class="accordion-button collapsed"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#checkConfigCollapse"
+                            aria-expanded="false"
+                            aria-controls="checkConfigCollapse"
+                            disabled
+                        >
+                            Check configuration
+                            <div
+                                class="ms-2 spinner-border spinner-border-sm text-secondary"
+                                role="status"
+                                hidden
+                            >
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <i class="bi bi-check-lg text-success" hidden></i>
+                            <i class="bi bi-x-lg text-danger" hidden></i>
+                        </button>
+                    </h2>
+                    <div
+                        id="checkConfigCollapse"
+                        class="accordion-collapse collapse"
+                        aria-labelledby="checkConfigHeader"
+                        data-bs-parent="#configAccordion"
+                    >
+                        <div class="accordion-body">
+                            <p id="checkConfigText">
+                                Checking whether or not you have text-debugging
+                                enabled...
+                            </p>
+                            <p id="checkConfigTextSuccess" hidden>
+                                The game is configured correctly!
+                            </p>
+                            <p id="checkConfigTextFail" hidden>
+                                The game is not configured correctly!
+                                <button
+                                    class="btn btn-primary"
+                                    id="updateConfigButton"
+                                >
+                                    Fix it!
+                                </button>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="checkFilesHeader">
+                        <button
+                            class="accordion-button collapsed"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#checkContentCollapse"
+                            aria-expanded="false"
+                            aria-controls="checkContentCollapse"
+                            disabled
+                        >
+                            Check for files
+                            <div
+                                class="ms-2 spinner-border spinner-border-sm text-secondary"
+                                role="status"
+                                hidden
+                            >
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <i class="bi bi-check-lg text-success" hidden></i>
+                            <i class="bi bi-x-lg text-danger" hidden></i>
+                        </button>
+                    </h2>
+                    <div
+                        id="checkContentCollapse"
+                        class="accordion-collapse collapse"
+                        aria-labelledby="checkFilesHeader"
+                        data-bs-parent="#configAccordion"
+                    >
+                        <div class="accordion-body">
+                            <p id="checkFilesText">
+                                Checking if lang folder is present...
+                            </p>
+                            <p id="checkFilesTextSuccess" hidden>
+                                Lang folder is present!
+                            </p>
+                            <p id="checkFilesTextFail" hidden>
+                                Lang folder is not present! Start the game once
+                                and wait 10 seconds for the folder to be
+                                created. Then close the game again!
+                                <button id="checkFilesButton">Re-check</button>
+                            </p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="w-100 h-100 d-flex flex-column justify-content-center align-items-center">
-        <p class="fw-light mb-3">
-            You currently have <b class="fw-bold" id="pendingChanges">0</b> changes pending.
-        </p>
-          
-        <div class="btn-group mt-3" role="group">
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#changeListModal"><i class="bi bi-list-ul"></i> View changes</button>
-            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#editChangeModal"><i class="bi bi-plus-lg"></i> Add change</button>
-        </div>
-          
-        <p class="fw-light text-danger mt-5 mb-3">
-            Don't forget to export your changes after you applied them! This way you can re-import them if war thunder updates the translations.
-        </p>
-          
-        <div class="btn-group" role="group">
-            <button class="btn btn-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="If you previously saved your changes, or someone sent your their changelist. Import it here!"><i class="bi bi-download"></i> Import changelist</button>
-            <button class="btn btn-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Export your current changelist to be able to re-apply it if war thunder updates their translations in the future."><i class="bi bi-upload"></i> Export changelist</button>
-            <button class="btn btn-warning" data-bs-toggle="tooltip" data-bs-placement="top" title="Save the currently pending changes to the game. (Requires a restart to see if the game is running)"><i class="bi bi-pencil-fill"></i> Save changes to WT</button>
-        </div>
-    </div>
-        
-        <div class="modal modal-xl" id="changeListModal" tabindex="-1" data-bs-theme="dark">
-          <div class="modal-dialog">
-            <div class="modal-content">
-              <div class="modal-header bg-dark">
-                <h5 class="modal-title text-white">Current Changelist</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-              <div class="modal-body text-white overflow-auto" style="max-height: 50vh;">
-                <p class="fw-light">These changes will be applied when you press Save changes to WT</p>
-                <table class="table">
-                  <thead>
-                    <tr>
-                      <th scope="col">id</th>
-                      <th scope="col">Lang</th>
-                      <th scope="col">Original</th>
-                      <th scope="col">Edited</th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody id="changeListTableBody">
-                    
-                  </tbody>
-                </table>
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Save changes</button>
-              </div>
+        <div
+            class="toast align-items-center bg-success position-relative start-50 mt-2 translate-middle-x"
+            role="alert"
+            aria-live="assertive"
+            aria-atomic="true"
+            id="filesLoadedToast"
+        >
+            <div class="d-flex">
+                <div class="toast-body">All translation files loaded!</div>
             </div>
-          </div>
         </div>
-        
-        <div class="modal modal-l" id="editChangeModal" tabindex="-1" data-bs-theme="dark">
-          <div class="modal-dialog">
-            <div class="modal-content">
-              <div class="modal-header bg-dark">
-                <h5 class="modal-title text-white">Add/Edit Change</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-              <div class="modal-body">
-                
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary">Save</button>
-              </div>
+
+        <div
+            class="w-100 h-100 d-flex flex-column justify-content-center align-items-center"
+        >
+            <p class="fw-light mb-3">
+                You currently have
+                <b class="fw-bold" id="pendingChanges">0</b> changes pending.
+            </p>
+
+            <div class="btn-group mt-3" role="group">
+                <button
+                    class="btn btn-primary"
+                    data-bs-toggle="modal"
+                    data-bs-target="#changeListModal"
+                >
+                    <i class="bi bi-list-ul"></i> View changes
+                </button>
+                <button
+                    class="btn btn-success"
+                    data-bs-toggle="modal"
+                    data-bs-target="#editChangeModal"
+                >
+                    <i class="bi bi-plus-lg"></i> Add change
+                </button>
             </div>
-          </div>
-    </div>
-  </body>
+
+            <p class="fw-light text-danger mt-5 mb-3">
+                Don't forget to export your changes after you applied them! This
+                way you can re-import them if war thunder updates the
+                translations.
+            </p>
+
+            <div class="btn-group" role="group">
+                <button
+                    class="btn btn-primary"
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="top"
+                    title="If you previously saved your changes, or someone sent your their changelist. Import it here!"
+                >
+                    <i class="bi bi-download"></i> Import changelist
+                </button>
+                <button
+                    class="btn btn-primary"
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="top"
+                    title="Export your current changelist to be able to re-apply it if war thunder updates their translations in the future."
+                >
+                    <i class="bi bi-upload"></i> Export changelist
+                </button>
+                <button
+                    class="btn btn-warning"
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="top"
+                    title="Save the currently pending changes to the game. (Requires a restart to see if the game is running)"
+                >
+                    <i class="bi bi-pencil-fill"></i> Save changes to WT
+                </button>
+            </div>
+        </div>
+
+        <div
+            class="modal modal-xl"
+            id="changeListModal"
+            tabindex="-1"
+            data-bs-theme="dark"
+        >
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-dark">
+                        <h5 class="modal-title text-white">
+                            Current Changelist
+                        </h5>
+                        <button
+                            type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"
+                        ></button>
+                    </div>
+                    <div
+                        class="modal-body text-white overflow-auto"
+                        style="max-height: 50vh"
+                    >
+                        <p class="fw-light">
+                            These changes will be applied when you press Save
+                            changes to WT
+                        </p>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">id</th>
+                                    <th scope="col">Lang</th>
+                                    <th scope="col">Original</th>
+                                    <th scope="col">Edited</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="changeListTableBody"></tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button
+                            type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal"
+                        >
+                            Close
+                        </button>
+                        <button type="button" class="btn btn-primary">
+                            Save changes
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div
+            class="modal modal-l"
+            id="editChangeModal"
+            tabindex="-1"
+            data-bs-theme="dark"
+        >
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-dark">
+                        <h5 class="modal-title text-white">Add/Edit Change</h5>
+                        <button
+                            type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"
+                        ></button>
+                    </div>
+                    <div class="modal-body">
+                        <select id="editChangeModalLangSelect"></select>
+                    </div>
+                    <div class="modal-footer">
+                        <button
+                            type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal"
+                        >
+                            Cancel
+                        </button>
+                        <button type="button" class="btn btn-primary">
+                            Save
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
 </html>
