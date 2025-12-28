@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>Warthunder translation editor</title>
         <link rel="stylesheet" href="scss/main.scss" />
-        <script type="module" src="js/main.js"></script>
+        <script src="js/main.js"></script>
     </head>
     <body data-bs-theme="dark" class="h-100">
         <div
@@ -317,6 +317,17 @@
                     </div>
                     <div class="modal-body">
                         <select id="editChangeModalLangSelect"></select>
+
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">ID</th>
+                                    <th scope="col">Text</th>
+                                    <th scope="col"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="editChangeModalTBody"></tbody>
+                        </table>
                     </div>
                     <div class="modal-footer">
                         <button

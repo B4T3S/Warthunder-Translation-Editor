@@ -2,10 +2,33 @@
 import * as bootstrap from "bootstrap";
 import $ from "jquery";
 import Papa from "papaparse";
+import Database from "./database";
 
 let gameFiles = {};
-let langFiles = {};
-let languages = new Array();
+let languages = [
+  "English",
+  "French",
+  "Italian",
+  "German",
+  "Spanish",
+  "Russian",
+  "Polish",
+  "Czech",
+  "Turkish",
+  "Chinese",
+  "Japanese",
+  "Portuguese",
+  "Ukrainian",
+  "Serbian",
+  "Hungarian",
+  "Korean",
+  "Belarusian",
+  "Romanian",
+  "TChinese",
+  "HChinese",
+  "Vietnamese",
+];
+let dbInterface = new Database();
 
 // SETUP BLOCK
 
@@ -51,6 +74,28 @@ $(document).ready(() => {
   });
 
   $(checkFilesButton).on("click", verifyLangFolderExists);
+
+  $(editChangeModalLangSelect).on("change", function () {
+    const table = $(editChangeModalTBody);
+
+    table.html("");
+
+    const result = dbInterface.getPaginatedSearchResults(
+      $("#editChangeModalLangSelect").find(":selected").text(),
+      "",
+    );
+
+    result.forEach((res) => {
+      const row = $(`
+        <tr>
+          <th scope="row">${res[0]}</th>
+          <td>${res[1]}</td>
+        </tr>
+      `);
+
+      table.append(row);
+    });
+  });
 });
 
 // END SETUP BLOCK
@@ -199,19 +244,8 @@ function openCSV(file) {
         console.log(
           "Loaded " + file.name + " with " + results.data.length + " rows",
         );
-        langFiles[file.name] = results;
 
-        results.meta.fields.forEach((lang) => {
-          if (
-            !languages.includes(lang) &&
-            lang != "<ID|readonly|noverify>" &&
-            lang != "<Comments>" &&
-            lang != "<max_chars>" &&
-            lang != 'ps4override:t="%lang/ps4_specific.csv"'
-          ) {
-            languages.push(lang);
-          }
-        });
+        dbInterface.addTranslationFile(file.name, results.data, languages);
 
         resolve();
       },
