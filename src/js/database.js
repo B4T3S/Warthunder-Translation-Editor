@@ -90,10 +90,26 @@ export default class Database {
   }
 
   getPaginatedSearchResults(language, query, page = 0, pageSize = 15) {
+    const where = query == "" ? "" : `WHERE ${language} LIKE "%${query}%"`;
+
     const result = this.db.exec(
-      `SELECT ID_readonly_noverify, ${language} FROM translations LIMIT ${pageSize} OFFSET ${page * pageSize}`,
+      `SELECT ID_readonly_noverify, ${language} FROM translations ${where} LIMIT ${pageSize} OFFSET ${page * pageSize}`,
     );
 
+    if (result[0] == undefined) return [];
+
     return result[0].values;
+  }
+
+  getPages(language, query, pageSize = 15) {
+    const where = query == "" ? "" : `WHERE ${language} LIKE "%${query}%"`;
+    console.log(where);
+    const result = this.db.exec(
+      `SELECT COUNT(${language}) FROM translations ${where};`,
+    );
+
+    if (result[0] == undefined) return 0;
+
+    return Math.ceil(result[0].values[0] / pageSize);
   }
 }

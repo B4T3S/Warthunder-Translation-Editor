@@ -11,6 +11,7 @@
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.11.3",
     "jquery": "^3.7.1",
+    "lodash.debounce": "^4.0.8",
     "papaparse": "^5.5.2",
     "sql.js": "^1.13.0"
   }

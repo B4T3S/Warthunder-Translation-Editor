@@ -299,7 +299,7 @@
         </div>
 
         <div
-            class="modal modal-l"
+            class="modal modal-lg"
             id="editChangeModal"
             tabindex="-1"
             data-bs-theme="dark"
@@ -316,7 +316,36 @@
                         ></button>
                     </div>
                     <div class="modal-body">
-                        <select id="editChangeModalLangSelect"></select>
+                        <div class="input-group mb-3">
+                            <label
+                                class="input-group-text"
+                                for="editChangeModalLangSelect"
+                                >Language</label
+                            >
+                            <select
+                                class="form-select"
+                                id="editChangeModalLangSelect"
+                            ></select>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="input-group">
+                                <span class="input-group-text">Search</span>
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="editChangeModalSearchInput"
+                                    aria-describedby="basic-addon3 basic-addon4"
+                                />
+                                <button
+                                    class="btn btn-danger"
+                                    type="button"
+                                    id="editChangeModalResetSearchButton"
+                                >
+                                    X
+                                </button>
+                            </div>
+                        </div>
 
                         <table class="table">
                             <thead>
@@ -328,6 +357,13 @@
                             </thead>
                             <tbody id="editChangeModalTBody"></tbody>
                         </table>
+
+                        <nav>
+                            <ul
+                                class="pagination"
+                                id="editChangePagination"
+                            ></ul>
+                        </nav>
                     </div>
                     <div class="modal-footer">
                         <button

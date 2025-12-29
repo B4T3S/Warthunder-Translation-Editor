@@ -3,6 +3,7 @@ import * as bootstrap from "bootstrap";
 import $ from "jquery";
 import Papa from "papaparse";
 import Database from "./database";
+import debounce from "lodash.debounce";
 
 let gameFiles = {};
 let languages = [
@@ -73,28 +74,22 @@ $(document).ready(() => {
     });
   });
 
+  $("#editChangeModalSearchInput").on(
+    "input",
+    debounce(() => {
+      updateAdditionTable();
+    }, 350),
+  );
+
   $(checkFilesButton).on("click", verifyLangFolderExists);
 
   $(editChangeModalLangSelect).on("change", function () {
-    const table = $(editChangeModalTBody);
+    updateAdditionTable();
+  });
 
-    table.html("");
-
-    const result = dbInterface.getPaginatedSearchResults(
-      $("#editChangeModalLangSelect").find(":selected").text(),
-      "",
-    );
-
-    result.forEach((res) => {
-      const row = $(`
-        <tr>
-          <th scope="row">${res[0]}</th>
-          <td>${res[1]}</td>
-        </tr>
-      `);
-
-      table.append(row);
-    });
+  $("#editChangeModalResetSearchButton").on("click", () => {
+    $("#editChangeModalSearchInput").val("");
+    updateAdditionTable();
   });
 });
 
@@ -205,6 +200,8 @@ function verifyLangFolderExists() {
           autohide: true,
           delay: 3000,
         }).show();
+
+        updateAdditionTable();
       });
     }, 500);
   } else {
@@ -251,6 +248,66 @@ function openCSV(file) {
       },
     });
   });
+}
+
+function updateAdditionTable(page = 0) {
+  const table = $(editChangeModalTBody);
+  const lang = $("#editChangeModalLangSelect").find(":selected").text();
+  const query = $("#editChangeModalSearchInput").val();
+
+  table.html("");
+
+  const result = dbInterface.getPaginatedSearchResults(lang, query, page);
+
+  result.forEach((res) => {
+    const row = $(`
+      <tr>
+        <th scope="row">${res[0]}</th>
+        <td>${res[1]}</td>
+      </tr>
+    `);
+
+    table.append(row);
+  });
+
+  updateAdditionPagination(dbInterface.getPages(lang, query), page);
+}
+
+function updateAdditionPagination(pages, selectedPage) {
+  const pagination = $("#editChangePagination");
+  const page = `
+    <li class="page-item">
+        <a class="page-link">3</a>
+    </li>
+    `;
+
+  pagination.html("");
+
+  let startPage = selectedPage - 5;
+  if (startPage <= 0) {
+    startPage = 1;
+  }
+
+  let length = 11;
+  console.log(`${pages} | ${startPage} | ${length}`);
+  if (startPage + length > pages) {
+    length = pages - startPage;
+  }
+
+  for (let i = startPage; i < startPage + length; i++) {
+    const currentPage = $(page);
+    const a = currentPage.children("a");
+    a.text(i);
+    a.on("click", () => {
+      updateAdditionTable(i - 1);
+    });
+
+    if (i - 1 == selectedPage) {
+      currentPage.addClass("active");
+    }
+
+    pagination.append(currentPage);
+  }
 }
 
 // END MAIN BLOCK
