@@ -11,7 +11,6 @@ export default class Database {
       this.db.run(`
         CREATE TABLE translations (
           filename TEXT,
-          dirty INTEGER,
           ID_readonly_noverify TEXT,
           English TEXT,
           French TEXT,
@@ -37,6 +36,17 @@ export default class Database {
           Comments TEXT,
           max_chars TEXT
         );
+    `);
+      this.db.run(`
+      CREATE TABLE changes (
+        key TEXT PRIMARY KEY,
+        lang TEXT,
+        change TEXT
+      );
+    `);
+
+      this.db.run(`
+        CREATE UNIQUE INDEX changes_key ON changes(key);
       `);
     });
   }
@@ -45,14 +55,13 @@ export default class Database {
     this.db.run("BEGIN TRANSACTION;");
 
     const stmt = this.db.prepare(
-      "INSERT INTO translations VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
+      "INSERT INTO translations VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
     );
 
     try {
       for (const row of dataArray) {
         const values = [
           filename,
-          false,
           row["<ID|readonly|noverify>"] ?? "",
           row["<English>"] ?? "",
           row["<French>"] ?? "",
@@ -115,16 +124,34 @@ export default class Database {
   }
 
   addChange(language, key, newText) {
-    const cmd = `UPDATE translations SET ${language} = '${newText.replaceAll("'", "''")}', dirty = TRUE WHERE ID_readonly_noverify = '${key}';`;
-    console.log(cmd);
-    this.db.exec(cmd);
+    const translationCmd = `UPDATE translations SET ${language} = '${newText.replaceAll("'", "''")}' WHERE ID_readonly_noverify = '${key}';`;
+    const changeStatement = this.db.prepare(
+      `REPLACE INTO changes (key, lang, change) VALUES (?, ?, ?)`,
+    );
+    this.db.run("BEGIN TRANSACTION;");
+    try {
+      this.db.exec(translationCmd);
+      changeStatement.run([key, language, newText]);
+
+      changeStatement.free();
+      this.db.run("COMMIT;");
+    } catch (ex) {
+      this.db.run("ROLLBACK;");
+      console.error(ex);
+    }
   }
 
   getChangeCount() {
-    const result = this.db.exec(
-      "SELECT COUNT(*) FROM translations WHERE dirty = TRUE;",
-    );
+    const result = this.db.exec("SELECT COUNT(*) FROM changes;");
 
     return result[0].values[0];
+  }
+
+  getAllChanges() {
+    const result = this.db.exec("SELECT * FROM changes;");
+
+    if (result[0] == undefined) return [];
+
+    return result[0].values;
   }
 }

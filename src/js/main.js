@@ -91,6 +91,9 @@ $(document).ready(() => {
     $("#editChangeSearchInput").val("");
     updateAdditionTable();
   });
+
+  $("#exportButton").on("click", exportChanges);
+  $("#importButton").on("click", importChanges);
 });
 
 // END SETUP BLOCK
@@ -330,5 +333,56 @@ function addChange(row) {
 
 function updatePendingChanges() {
   $("#pendingChanges").text(dbInterface.getChangeCount());
+}
+
+function exportChanges() {
+  const changes = dbInterface.getAllChanges();
+  if (changes == []) return;
+
+  const jsonString = JSON.stringify(changes, null, 2);
+
+  window
+    .showSaveFilePicker({
+      suggestedName: "warthunder-translations.json",
+      types: [
+        {
+          description: "JSON file",
+          accept: { "application/json": [".json"] },
+        },
+      ],
+    })
+    .then(async (handle) => {
+      const writable = await handle.createWritable();
+      await writable.write(jsonString);
+      await writable.close();
+    });
+}
+
+function importChanges() {
+  window
+    .showOpenFilePicker({
+      types: [
+        {
+          description: "JSON file",
+          accept: { "application/json": [".json"] },
+        },
+      ],
+    })
+    .then(async (handles) => {
+      if (!handles.length) return;
+
+      const file = await handles[0].getFile();
+      const fileContent = await file.text();
+
+      const data = JSON.parse(fileContent);
+      data.forEach((entry) => {
+        if (entry.length != 3) return;
+
+        dbInterface.addChange(entry[1], entry[0], entry[2]);
+      });
+
+      updatePendingChanges();
+      updateAdditionTable();
+    });
 }
 // END MAIN BLOCK
