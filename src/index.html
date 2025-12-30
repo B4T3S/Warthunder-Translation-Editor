@@ -199,13 +199,57 @@
                 >
                     <i class="bi bi-list-ul"></i> View changes
                 </button>
-                <button
-                    class="btn btn-success"
-                    data-bs-toggle="modal"
-                    data-bs-target="#editChangeModal"
-                >
-                    <i class="bi bi-plus-lg"></i> Add change
-                </button>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Search translations</h5>
+                    <div class="input-group mb-3">
+                        <label
+                            class="input-group-text"
+                            for="editChangeLangSelect"
+                            >Language</label
+                        >
+                        <select
+                            class="form-select"
+                            id="editChangeLangSelect"
+                        ></select>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="input-group">
+                            <span class="input-group-text">Search</span>
+                            <input
+                                type="text"
+                                class="form-control"
+                                id="editChangeSearchInput"
+                                aria-describedby="basic-addon3 basic-addon4"
+                            />
+                            <button
+                                class="btn btn-danger"
+                                type="button"
+                                id="editChangeResetSearchButton"
+                            >
+                                X
+                            </button>
+                        </div>
+                    </div>
+
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">ID</th>
+                                <th scope="col">Text</th>
+                                <th scope="col"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="editChangeTBody"></tbody>
+                    </table>
+
+                    <nav>
+                        <ul class="pagination" id="editChangePagination"></ul>
+                    </nav>
+                </div>
             </div>
 
             <p class="fw-light text-danger mt-5 mb-3">
@@ -292,89 +336,6 @@
                         </button>
                         <button type="button" class="btn btn-primary">
                             Save changes
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div
-            class="modal modal-lg"
-            id="editChangeModal"
-            tabindex="-1"
-            data-bs-theme="dark"
-        >
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header bg-dark">
-                        <h5 class="modal-title text-white">Add/Edit Change</h5>
-                        <button
-                            type="button"
-                            class="btn-close"
-                            data-bs-dismiss="modal"
-                            aria-label="Close"
-                        ></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="input-group mb-3">
-                            <label
-                                class="input-group-text"
-                                for="editChangeModalLangSelect"
-                                >Language</label
-                            >
-                            <select
-                                class="form-select"
-                                id="editChangeModalLangSelect"
-                            ></select>
-                        </div>
-
-                        <div class="mb-3">
-                            <div class="input-group">
-                                <span class="input-group-text">Search</span>
-                                <input
-                                    type="text"
-                                    class="form-control"
-                                    id="editChangeModalSearchInput"
-                                    aria-describedby="basic-addon3 basic-addon4"
-                                />
-                                <button
-                                    class="btn btn-danger"
-                                    type="button"
-                                    id="editChangeModalResetSearchButton"
-                                >
-                                    X
-                                </button>
-                            </div>
-                        </div>
-
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th scope="col">ID</th>
-                                    <th scope="col">Text</th>
-                                    <th scope="col"></th>
-                                </tr>
-                            </thead>
-                            <tbody id="editChangeModalTBody"></tbody>
-                        </table>
-
-                        <nav>
-                            <ul
-                                class="pagination"
-                                id="editChangePagination"
-                            ></ul>
-                        </nav>
-                    </div>
-                    <div class="modal-footer">
-                        <button
-                            type="button"
-                            class="btn btn-secondary"
-                            data-bs-dismiss="modal"
-                        >
-                            Cancel
-                        </button>
-                        <button type="button" class="btn btn-primary">
-                            Save
                         </button>
                     </div>
                 </div>

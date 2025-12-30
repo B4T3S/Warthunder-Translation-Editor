@@ -74,7 +74,7 @@ $(document).ready(() => {
     });
   });
 
-  $("#editChangeModalSearchInput").on(
+  $("#editChangeSearchInput").on(
     "input",
     debounce(() => {
       updateAdditionTable();
@@ -83,12 +83,12 @@ $(document).ready(() => {
 
   $(checkFilesButton).on("click", verifyLangFolderExists);
 
-  $(editChangeModalLangSelect).on("change", function () {
+  $(editChangeLangSelect).on("change", function () {
     updateAdditionTable();
   });
 
-  $("#editChangeModalResetSearchButton").on("click", () => {
-    $("#editChangeModalSearchInput").val("");
+  $("#editChangeResetSearchButton").on("click", () => {
+    $("#editChangeSearchInput").val("");
     updateAdditionTable();
   });
 });
@@ -188,7 +188,7 @@ function verifyLangFolderExists() {
       Promise.all(tasks).then(() => {
         console.log("ALL FILES LOADED!");
 
-        const modal = document.getElementById("editChangeModalLangSelect");
+        const modal = document.getElementById("editChangeLangSelect");
         languages.forEach((lang) => {
           const option = document.createElement("option");
           option.value = lang;
@@ -251,9 +251,9 @@ function openCSV(file) {
 }
 
 function updateAdditionTable(page = 0) {
-  const table = $(editChangeModalTBody);
-  const lang = $("#editChangeModalLangSelect").find(":selected").text();
-  const query = $("#editChangeModalSearchInput").val();
+  const table = $(editChangeTBody);
+  const lang = $("#editChangeLangSelect").find(":selected").text();
+  const query = $("#editChangeSearchInput").val();
 
   table.html("");
 
@@ -262,11 +262,13 @@ function updateAdditionTable(page = 0) {
   result.forEach((res) => {
     const row = $(`
       <tr>
-        <th scope="row">${res[0]}</th>
-        <td>${res[1]}</td>
+        <th scope="row" class="text-truncate" style="max-width: 250px;">${res[0]}</th>
+        <td><input type="text" /></td>
       </tr>
     `);
 
+    row.find("th").attr("title", res[0]);
+    row.find("input").val(res[1]);
     table.append(row);
   });
 
