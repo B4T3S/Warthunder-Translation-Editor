@@ -259,16 +259,20 @@ function updateAdditionTable(page = 0) {
 
   const result = dbInterface.getPaginatedSearchResults(lang, query, page);
 
-  result.forEach((res) => {
+  result.forEach((res, index) => {
     const row = $(`
-      <tr>
+      <tr id="row-${index}">
         <th scope="row" class="text-truncate" style="max-width: 250px;">${res[0]}</th>
-        <td><input type="text" /></td>
+        <td><input type="text" class="w-100" /></td>
+        <td><button class="btn btn-success"><i class="bi bi-floppy-fill"></i></button></td>
       </tr>
     `);
 
     row.find("th").attr("title", res[0]);
     row.find("input").val(res[1]);
+    row.find("button").on("click", () => {
+      addChange(index);
+    });
     table.append(row);
   });
 
@@ -291,7 +295,7 @@ function updateAdditionPagination(pages, selectedPage) {
   }
 
   let length = 11;
-  console.log(`${pages} | ${startPage} | ${length}`);
+
   if (startPage + length > pages) {
     length = pages - startPage;
   }
@@ -312,4 +316,19 @@ function updateAdditionPagination(pages, selectedPage) {
   }
 }
 
+function addChange(row) {
+  const lang = $("#editChangeLangSelect").find(":selected").text();
+  const id = $(`#row-${row}`).find("th").text();
+  const value = $(`#row-${row}`).find("input").val();
+
+  console.log(`Adding change of field ${id} to ${value} for language ${lang}`);
+
+  dbInterface.addChange(lang, id, value);
+
+  updatePendingChanges();
+}
+
+function updatePendingChanges() {
+  $("#pendingChanges").text(dbInterface.getChangeCount());
+}
 // END MAIN BLOCK

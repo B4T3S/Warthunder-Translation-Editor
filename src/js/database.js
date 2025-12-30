@@ -11,6 +11,7 @@ export default class Database {
       this.db.run(`
         CREATE TABLE translations (
           filename TEXT,
+          dirty INTEGER,
           ID_readonly_noverify TEXT,
           English TEXT,
           French TEXT,
@@ -44,13 +45,14 @@ export default class Database {
     this.db.run("BEGIN TRANSACTION;");
 
     const stmt = this.db.prepare(
-      "INSERT INTO translations VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
+      "INSERT INTO translations VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
     );
 
     try {
       for (const row of dataArray) {
         const values = [
           filename,
+          false,
           row["<ID|readonly|noverify>"] ?? "",
           row["<English>"] ?? "",
           row["<French>"] ?? "",
@@ -103,7 +105,6 @@ export default class Database {
 
   getPages(language, query, pageSize = 15) {
     const where = query == "" ? "" : `WHERE ${language} LIKE "%${query}%"`;
-    console.log(where);
     const result = this.db.exec(
       `SELECT COUNT(${language}) FROM translations ${where};`,
     );
@@ -111,5 +112,19 @@ export default class Database {
     if (result[0] == undefined) return 0;
 
     return Math.ceil(result[0].values[0] / pageSize);
+  }
+
+  addChange(language, key, newText) {
+    const cmd = `UPDATE translations SET ${language} = '${newText.replaceAll("'", "''")}', dirty = TRUE WHERE ID_readonly_noverify = '${key}';`;
+    console.log(cmd);
+    this.db.exec(cmd);
+  }
+
+  getChangeCount() {
+    const result = this.db.exec(
+      "SELECT COUNT(*) FROM translations WHERE dirty = TRUE;",
+    );
+
+    return result[0].values[0];
   }
 }
