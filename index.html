@@ -1,4 +1,8 @@
-<!DOCTYPE html><html lang=en class=h-100><meta charset=utf-8><meta name=viewport content="width=device-width, initial-scale=1"><title>Warthunder translation editor</title><link rel=stylesheet href=Warthunder-Translation-Editor.60476875.css><script src=Warthunder-Translation-Editor.eabbf801.js type=module></script><body data-bs-theme=dark class=h-100>
+<!DOCTYPE html><html lang=en class=h-100><meta charset=utf-8><meta name=viewport content="width=device-width, initial-scale=1"><title>Warthunder translation editor</title><link rel=stylesheet href=Warthunder-Translation-Editor.60476875.css><script src=Warthunder-Translation-Editor.083601b5.js type=module></script><body data-bs-theme=dark class=h-100>
+        <div id=loadingWindow class="align-items-center bg-dark d-flex fixed-top flex-column justify-content-center shadow-lg vh-100 vw-100">
+            <h1>Loading translation files!</h1>
+            <p>This might take a couple seconds...</p>
+        </div>
         <div id=configWindow class="align-items-center bg-dark d-flex fixed-top flex-column justify-content-center shadow-lg vh-100 vw-100">
             <h1 class=text-white>Warthunder translation editor</h1>
             <p class=text-secondary>
@@ -123,12 +127,6 @@
             </div>
         </div>
 
-        <div class="align-items-center bg-success mt-2 position-absolute start-50 toast translate-middle-x" role=alert aria-live=assertive aria-atomic=true id=filesLoadedToast>
-            <div class=d-flex>
-                <div class=toast-body>All translation files loaded!</div>
-            </div>
-        </div>
-
         <div class="align-items-center d-flex flex-column justify-content-center w-100">
             <p class="fw-light my-3">
                 You currently have
@@ -141,6 +139,8 @@
                     <div class="input-group mb-3">
                         <label class=input-group-text for=editChangeLangSelect>Language</label>
                         <select class=form-select id=editChangeLangSelect></select>
+                        <label class=input-group-text for=editChangeLangSelect>File</label>
+                        <select class=form-select id=editChangeFileSelect></select>
                     </div>
 
                     <div class=mb-3>
@@ -186,6 +186,22 @@
                 <button class="btn btn-warning" data-bs-toggle=tooltip data-bs-placement=top id=saveButton title="Save the currently pending changes to the game. (Requires a restart to see if the game is running)">
                     <i class="bi bi-pencil-fill"></i> Save changes to WT
                 </button>
+            </div>
+        </div>
+        <div class="bottom-0 end-0 p-3 position-fixed toast-container">
+            <div class="bg-success toast" role=alert aria-live=assertive aria-atomic=true id=filesLoadedToast>
+                <div class=d-flex>
+                    <div class=toast-body>All translation files loaded!</div>
+                </div>
+            </div>
+
+            <div class="bg-success toast" role=alert aria-live=assertive aria-atomic=true id=changesSavedToast>
+                <div class=d-flex>
+                    <div class=toast-body>
+                        Done saving changes to warthunder! (Re)start the game to
+                        see the changes!
+                    </div>
+                </div>
             </div>
         </div>
     
