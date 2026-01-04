@@ -94,6 +94,7 @@ $(document).ready(() => {
 
   $("#exportButton").on("click", exportChanges);
   $("#importButton").on("click", importChanges);
+  $("#saveButton").on("click", saveChanges);
 });
 
 // END SETUP BLOCK
@@ -185,7 +186,7 @@ function verifyLangFolderExists() {
 
       const files = await Array.fromAsync(await gameFiles["lang"].values());
       const tasks = files.map(async (entry) => {
-        return openCSV(await entry.getFile());
+        return await importCSV(await entry.getFile());
       });
 
       Promise.all(tasks).then(() => {
@@ -236,21 +237,35 @@ class Change {
   }
 }
 
-function openCSV(file) {
-  return new Promise((resolve) => {
+function loadCSV(file) {
+  return new Promise((resolve, reject) => {
     Papa.parse(file, {
       header: true,
-      complete: function (results) {
-        console.log(
-          "Loaded " + file.name + " with " + results.data.length + " rows",
-        );
-
-        dbInterface.addTranslationFile(file.name, results.data, languages);
-
-        resolve();
-      },
+      complete: (results) => resolve(results),
+      error: (err) => reject(err),
     });
   });
+}
+
+async function writeCSV(fileHandle, results) {
+  console.log(`Writing file ${fileHandle.name} to disk!`);
+
+  const text = Papa.unparse(results.data, {
+    columns: results.meta.fields,
+    delimiter: results.meta.delimiter,
+    newline: results.meta.linebreak,
+  });
+
+  const writable = await fileHandle.createWritable();
+  await writable.write(text);
+  await writable.close();
+}
+
+async function importCSV(file) {
+  const results = await loadCSV(file);
+  console.log("Loaded " + file.name + " with " + results.data.length + " rows");
+
+  dbInterface.addTranslationFile(file.name, results.data, languages);
 }
 
 function updateAdditionTable(page = 0) {
@@ -376,7 +391,7 @@ function importChanges() {
 
       const data = JSON.parse(fileContent);
       data.forEach((entry) => {
-        if (entry.length != 3) return;
+        if (entry.length != 4) return;
 
         dbInterface.addChange(entry[1], entry[0], entry[2]);
       });
@@ -384,5 +399,41 @@ function importChanges() {
       updatePendingChanges();
       updateAdditionTable();
     });
+}
+
+async function saveChanges() {
+  console.log("Saving changes");
+  const changes = dbInterface.getAllChanges();
+  if (!changes.length) return;
+
+  const fileNames = [...new Set(changes.map((c) => c[3]))];
+  const files = await Array.fromAsync(await gameFiles["lang"].values());
+
+  const keyFirst = {};
+  changes.forEach((change) => {
+    keyFirst[change[0]] = change;
+  });
+
+  fileNames.forEach((filename) => {
+    files.forEach(async (file) => {
+      if (file.name != filename) {
+        return;
+      }
+
+      const csv = await loadCSV(await file.getFile());
+
+      for (const row of csv.data) {
+        if (row["<ID|readonly|noverify>"] in keyFirst) {
+          const correctedLang = `<${keyFirst[row["<ID|readonly|noverify>"]][1]}>`;
+          row[correctedLang] = keyFirst[row["<ID|readonly|noverify>"]][2];
+          console.log(
+            `Applying change to key ${row["<ID|readonly|noverify>"]} in file ${file.name} for language ${correctedLang}`,
+          );
+        }
+      }
+
+      await writeCSV(file, csv);
+    });
+  });
 }
 // END MAIN BLOCK

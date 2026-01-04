@@ -148,7 +148,9 @@ export default class Database {
   }
 
   getAllChanges() {
-    const result = this.db.exec("SELECT * FROM changes;");
+    const result = this.db.exec(
+      "SELECT c.key, c.lang, c.change, t.filename FROM changes c JOIN translations t ON c.key = t.ID_readonly_noverify;",
+    );
 
     if (result[0] == undefined) return [];
 
