@@ -216,6 +216,11 @@ function verifyLangFolderExists() {
       Promise.all(tasks).then(() => {
         console.log("ALL FILES LOADED!");
 
+        $("#loadingWindow").attr(
+          "style",
+          "transition-duration: .75s; top: -105vh",
+        );
+
         const modal = document.getElementById("editChangeLangSelect");
         languages.forEach((lang) => {
           const option = document.createElement("option");
