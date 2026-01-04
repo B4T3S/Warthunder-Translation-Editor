@@ -83,7 +83,11 @@ $(document).ready(() => {
 
   $(checkFilesButton).on("click", verifyLangFolderExists);
 
-  $(editChangeLangSelect).on("change", function () {
+  $("#editChangeLangSelect").on("change", function () {
+    updateAdditionTable();
+  });
+
+  $("#editChangeFileSelect").on("change", function () {
     updateAdditionTable();
   });
 
@@ -221,12 +225,10 @@ function verifyLangFolderExists() {
           "transition-duration: .75s; top: -105vh",
         );
 
-        const modal = document.getElementById("editChangeLangSelect");
+        const modal = $("#editChangeLangSelect");
+        console.log(modal);
         languages.forEach((lang) => {
-          const option = document.createElement("option");
-          option.value = lang;
-          option.innerText = lang;
-          modal.appendChild(option);
+          modal.append(`<option value="${lang}">${lang}</option>`);
         });
 
         bootstrap.Toast.getOrCreateInstance($("#filesLoadedToast"), {
@@ -294,17 +296,22 @@ async function importCSV(file) {
   const results = await loadCSV(file);
   console.log("Loaded " + file.name + " with " + results.data.length + " rows");
 
+  const selected = file.name == "menu.csv" ? "selected" : "";
+  $("#editChangeFileSelect").append(
+    `<option value="${file.name}" ${selected}>${file.name}</option>`,
+  );
   dbInterface.addTranslationFile(file.name, results.data, languages);
 }
 
 function updateAdditionTable(page = 0) {
   const table = $(editChangeTBody);
   const lang = $("#editChangeLangSelect").find(":selected").text();
+  const file = $("#editChangeFileSelect").find(":selected").text();
   const query = $("#editChangeSearchInput").val();
 
   table.html("");
 
-  const result = dbInterface.getPaginatedSearchResults(lang, query, page);
+  const result = dbInterface.getPaginatedSearchResults(lang, file, query, page);
 
   result.forEach((res, index) => {
     const row = $(`
@@ -323,7 +330,7 @@ function updateAdditionTable(page = 0) {
     table.append(row);
   });
 
-  updateAdditionPagination(dbInterface.getPages(lang, query), page);
+  updateAdditionPagination(dbInterface.getPages(lang, file, query), page);
 }
 
 function updateAdditionPagination(pages, selectedPage) {

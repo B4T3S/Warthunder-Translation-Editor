@@ -100,8 +100,11 @@ export default class Database {
     }
   }
 
-  getPaginatedSearchResults(language, query, page = 0, pageSize = 15) {
-    const where = query == "" ? "" : `WHERE ${language} LIKE "%${query}%"`;
+  getPaginatedSearchResults(language, file, query, page = 0, pageSize = 15) {
+    const where =
+      query == ""
+        ? `WHERE filename = '${file}'`
+        : `WHERE filename = '${file}' AND ${language} LIKE "%${query}%"`;
 
     const result = this.db.exec(
       `SELECT ID_readonly_noverify, ${language} FROM translations ${where} LIMIT ${pageSize} OFFSET ${page * pageSize}`,
@@ -112,8 +115,11 @@ export default class Database {
     return result[0].values;
   }
 
-  getPages(language, query, pageSize = 15) {
-    const where = query == "" ? "" : `WHERE ${language} LIKE "%${query}%"`;
+  getPages(language, file, query, pageSize = 15) {
+    const where =
+      query == ""
+        ? `WHERE filename = '${file}'`
+        : `WHERE filename = '${file}' AND ${language} LIKE "%${query}%"`;
     const result = this.db.exec(
       `SELECT COUNT(${language}) FROM translations ${where};`,
     );
