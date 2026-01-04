@@ -95,11 +95,35 @@ $(document).ready(() => {
   $("#exportButton").on("click", exportChanges);
   $("#importButton").on("click", importChanges);
   $("#saveButton").on("click", saveChanges);
+
+  verifyBrowserCompat();
 });
 
 // END SETUP BLOCK
 
 // CONFIG BLOCK
+
+function verifyBrowserCompat() {
+  if (typeof window.showDirectoryPicker != "undefined") {
+    // Success, show the next step
+    $("#browserCompatHeader .spinner-border").attr("hidden", true);
+    $("#browserCompatHeader .bi-check-lg").attr("hidden", false);
+    $("#browserCompatHeader .bi-x-lg").attr("hidden", true);
+
+    setTimeout(async () => {
+      $("#locateGameHeader > button").attr("disabled", false);
+      $("#locateGameHeader > button").trigger("click");
+      $("#locateGameHeader > button").attr("disabled", true);
+      $("#locateGameHeader .spinner-border").attr("hidden", false);
+    }, 500);
+  } else {
+    // Unsupported, show the error message!
+    $("#browserCompatHeader .spinner-border").attr("hidden", true);
+    $("#browserCompatHeader .bi-check-lg").attr("hidden", true);
+    $("#browserCompatHeader .bi-x-lg").attr("hidden", false);
+    $("#browserUnsupported").attr("hidden", false);
+  }
+}
 
 function verifyDirectory(directory) {
   var entries = {};

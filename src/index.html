@@ -20,17 +20,17 @@
 
             <div class="accordion accordion-flush w-75" id="configAccordion">
                 <div class="accordion-item">
-                    <h2 class="accordion-header" id="locateGameHeader">
+                    <h2 class="accordion-header" id="browserCompatHeader">
                         <button
                             class="accordion-button"
                             type="button"
                             data-bs-toggle="collapse"
-                            data-bs-target="#locateGameCollapse"
+                            data-bs-target="#browserCompatCollapse"
                             aria-expanded="true"
-                            aria-controls="locateGameCollapse"
+                            aria-controls="browserCompatCollapse"
                             disabled
                         >
-                            Locate game
+                            Browser compatibility
                             <div
                                 class="ms-2 spinner-border spinner-border-sm text-secondary"
                                 role="status"
@@ -42,8 +42,61 @@
                         </button>
                     </h2>
                     <div
-                        id="locateGameCollapse"
+                        id="browserCompatCollapse"
                         class="accordion-collapse collapse show"
+                        aria-labelledby="browserCompatHeader"
+                        data-bs-parent="#configAccordion"
+                    >
+                        <div class="accordion-body">
+                            <p>Checking browser compatibility...</p>
+                            <p
+                                class="text-danger"
+                                id="browserUnsupported"
+                                hidden
+                            >
+                                Your browser is incompatible! It needs to
+                                support the
+                                <a
+                                    href="https://developer.mozilla.org/de/docs/Web/API/Window/showDirectoryPicker"
+                                    >showDirectoryPicker</a
+                                >
+                                function!
+                                <br />
+                                <br />
+                                <span class="text-info">
+                                    <i class="bi bi-info-circle"></i>
+                                    Try a chromium based browser!</span
+                                >
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="locateGameHeader">
+                        <button
+                            class="accordion-button collapsed"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#locateGameCollapse"
+                            aria-expanded="false"
+                            aria-controls="locateGameCollapse"
+                            disabled
+                        >
+                            Locate game
+                            <div
+                                class="ms-2 spinner-border spinner-border-sm text-secondary"
+                                role="status"
+                                hidden
+                            >
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <i class="bi bi-check-lg text-success" hidden></i>
+                            <i class="bi bi-x-lg text-danger" hidden></i>
+                        </button>
+                    </h2>
+                    <div
+                        id="locateGameCollapse"
+                        class="accordion-collapse collapse"
                         aria-labelledby="locateGameHeader"
                         data-bs-parent="#configAccordion"
                     >
