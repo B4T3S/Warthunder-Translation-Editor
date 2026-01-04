@@ -19,3 +19,7 @@ install: # Install dependencies
 .PHONY: watch
 watch: # Watch for changes
 	ddev npm run watch
+
+.PHONY: build
+build: # Run production ready build
+	ddev npm run build
