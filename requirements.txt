@@ -1,6 +1,0 @@
-pandas
-pyinstaller
-nicegui
-pywebview
-semver
-requests

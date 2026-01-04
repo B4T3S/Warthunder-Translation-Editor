@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="en" class="h-100">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Warthunder translation editor</title>
+        <link rel="stylesheet" href="scss/main.scss" />
+        <script src="js/main.js"></script>
+    </head>
+    <body data-bs-theme="dark" class="h-100">
+        <div
+            id="configWindow"
+            class="fixed-top vw-100 vh-100 bg-dark d-flex flex-column justify-content-center align-items-center shadow-lg"
+        >
+            <h1 class="text-white">Warthunder translation editor</h1>
+            <p class="text-secondary">
+                There's some steps you need to do before you can edit the
+                translations
+            </p>
+
+            <div class="accordion accordion-flush w-75" id="configAccordion">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="browserCompatHeader">
+                        <button
+                            class="accordion-button"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#browserCompatCollapse"
+                            aria-expanded="true"
+                            aria-controls="browserCompatCollapse"
+                            disabled
+                        >
+                            Browser compatibility
+                            <div
+                                class="ms-2 spinner-border spinner-border-sm text-secondary"
+                                role="status"
+                            >
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <i class="bi bi-check-lg text-success" hidden></i>
+                            <i class="bi bi-x-lg text-danger" hidden></i>
+                        </button>
+                    </h2>
+                    <div
+                        id="browserCompatCollapse"
+                        class="accordion-collapse collapse show"
+                        aria-labelledby="browserCompatHeader"
+                        data-bs-parent="#configAccordion"
+                    >
+                        <div class="accordion-body">
+                            <p>Checking browser compatibility...</p>
+                            <p
+                                class="text-danger"
+                                id="browserUnsupported"
+                                hidden
+                            >
+                                Your browser is incompatible! It needs to
+                                support the
+                                <a
+                                    href="https://developer.mozilla.org/de/docs/Web/API/Window/showDirectoryPicker"
+                                    >showDirectoryPicker</a
+                                >
+                                function!
+                                <br />
+                                <br />
+                                <span class="text-info">
+                                    <i class="bi bi-info-circle"></i>
+                                    Try a chromium based browser!</span
+                                >
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="locateGameHeader">
+                        <button
+                            class="accordion-button collapsed"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#locateGameCollapse"
+                            aria-expanded="false"
+                            aria-controls="locateGameCollapse"
+                            disabled
+                        >
+                            Locate game
+                            <div
+                                class="ms-2 spinner-border spinner-border-sm text-secondary"
+                                role="status"
+                                hidden
+                            >
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <i class="bi bi-check-lg text-success" hidden></i>
+                            <i class="bi bi-x-lg text-danger" hidden></i>
+                        </button>
+                    </h2>
+                    <div
+                        id="locateGameCollapse"
+                        class="accordion-collapse collapse"
+                        aria-labelledby="locateGameHeader"
+                        data-bs-parent="#configAccordion"
+                    >
+                        <div class="accordion-body">
+                            <p>Locate the game folder</p>
+                            <div class="input-group mb-3">
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    placeholder="Path to game folder"
+                                    aria-label="Path to game folder"
+                                    aria-describedby="locateGameButton"
+                                    readonly
+                                />
+                                <button
+                                    class="btn btn-outline-secondary"
+                                    type="button"
+                                    id="folderPicker"
+                                >
+                                    Locate
+                                </button>
+                            </div>
+                            <p class="text-danger" id="wrongGamePath" hidden>
+                                Couldn't find the config.blk file in this
+                                directory! This is probably not the right
+                                folder!
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="checkConfigHeader">
+                        <button
+                            class="accordion-button collapsed"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#checkConfigCollapse"
+                            aria-expanded="false"
+                            aria-controls="checkConfigCollapse"
+                            disabled
+                        >
+                            Check configuration
+                            <div
+                                class="ms-2 spinner-border spinner-border-sm text-secondary"
+                                role="status"
+                                hidden
+                            >
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <i class="bi bi-check-lg text-success" hidden></i>
+                            <i class="bi bi-x-lg text-danger" hidden></i>
+                        </button>
+                    </h2>
+                    <div
+                        id="checkConfigCollapse"
+                        class="accordion-collapse collapse"
+                        aria-labelledby="checkConfigHeader"
+                        data-bs-parent="#configAccordion"
+                    >
+                        <div class="accordion-body">
+                            <p id="checkConfigText">
+                                Checking whether or not you have text-debugging
+                                enabled...
+                            </p>
+                            <p id="checkConfigTextSuccess" hidden>
+                                The game is configured correctly!
+                            </p>
+                            <p id="checkConfigTextFail" hidden>
+                                The game is not configured correctly!
+                                <button
+                                    class="btn btn-primary"
+                                    id="updateConfigButton"
+                                >
+                                    Fix it!
+                                </button>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="checkFilesHeader">
+                        <button
+                            class="accordion-button collapsed"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#checkContentCollapse"
+                            aria-expanded="false"
+                            aria-controls="checkContentCollapse"
+                            disabled
+                        >
+                            Check for files
+                            <div
+                                class="ms-2 spinner-border spinner-border-sm text-secondary"
+                                role="status"
+                                hidden
+                            >
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <i class="bi bi-check-lg text-success" hidden></i>
+                            <i class="bi bi-x-lg text-danger" hidden></i>
+                        </button>
+                    </h2>
+                    <div
+                        id="checkContentCollapse"
+                        class="accordion-collapse collapse"
+                        aria-labelledby="checkFilesHeader"
+                        data-bs-parent="#configAccordion"
+                    >
+                        <div class="accordion-body">
+                            <p id="checkFilesText">
+                                Checking if lang folder is present...
+                            </p>
+                            <p id="checkFilesTextSuccess" hidden>
+                                Lang folder is present!
+                            </p>
+                            <p id="checkFilesTextFail" hidden>
+                                Lang folder is not present! Start the game once
+                                and wait 10 seconds for the folder to be
+                                created. Then close the game again!
+                                <button id="checkFilesButton">Re-check</button>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div
+            class="toast align-items-center bg-success position-absolute start-50 mt-2 translate-middle-x"
+            role="alert"
+            aria-live="assertive"
+            aria-atomic="true"
+            id="filesLoadedToast"
+        >
+            <div class="d-flex">
+                <div class="toast-body">All translation files loaded!</div>
+            </div>
+        </div>
+
+        <div
+            class="w-100 d-flex flex-column justify-content-center align-items-center"
+        >
+            <p class="fw-light my-3">
+                You currently have
+                <b class="fw-bold" id="pendingChanges">0</b> changes pending.
+            </p>
+
+            <div class="card w-50">
+                <div class="card-body">
+                    <h5 class="card-title">Search translations</h5>
+                    <div class="input-group mb-3">
+                        <label
+                            class="input-group-text"
+                            for="editChangeLangSelect"
+                            >Language</label
+                        >
+                        <select
+                            class="form-select"
+                            id="editChangeLangSelect"
+                        ></select>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="input-group">
+                            <span class="input-group-text">Search</span>
+                            <input
+                                type="text"
+                                class="form-control"
+                                id="editChangeSearchInput"
+                                aria-describedby="basic-addon3 basic-addon4"
+                            />
+                            <button
+                                class="btn btn-danger"
+                                type="button"
+                                id="editChangeResetSearchButton"
+                            >
+                                X
+                            </button>
+                        </div>
+                    </div>
+
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">ID</th>
+                                <th scope="col">Text</th>
+                                <th scope="col"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="editChangeTBody"></tbody>
+                    </table>
+
+                    <nav>
+                        <ul class="pagination" id="editChangePagination"></ul>
+                    </nav>
+                </div>
+            </div>
+
+            <p class="fw-light text-danger mt-5 mb-3">
+                Don't forget to export your changes after you applied them! This
+                way you can re-import them if war thunder updates the
+                translations.
+            </p>
+
+            <div class="btn-group" role="group">
+                <button
+                    class="btn btn-primary"
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="top"
+                    id="importButton"
+                    title="If you previously saved your changes, or someone sent your their changelist. Import it here!"
+                >
+                    <i class="bi bi-upload"></i> Import changelist
+                </button>
+                <button
+                    class="btn btn-primary"
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="top"
+                    id="exportButton"
+                    title="Export your current changelist to be able to re-apply it when war thunder updates their translations in the future."
+                >
+                    <i class="bi bi-download"></i> Export changelist
+                </button>
+                <button
+                    class="btn btn-warning"
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="top"
+                    id="saveButton"
+                    title="Save the currently pending changes to the game. (Requires a restart to see if the game is running)"
+                >
+                    <i class="bi bi-pencil-fill"></i> Save changes to WT
+                </button>
+            </div>
+        </div>
+    </body>
+</html>
