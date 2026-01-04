@@ -226,7 +226,7 @@ function verifyLangFolderExists() {
 
         bootstrap.Toast.getOrCreateInstance($("#filesLoadedToast"), {
           autohide: true,
-          delay: 3000,
+          delay: 2000,
         }).show();
 
         updateAdditionTable();
@@ -438,8 +438,8 @@ async function saveChanges() {
     keyFirst[change[0]] = change;
   });
 
-  fileNames.forEach((filename) => {
-    files.forEach(async (file) => {
+  const tasks = fileNames.map(async (filename) => {
+    const fileActions = files.map(async (file) => {
       if (file.name != filename) {
         return;
       }
@@ -458,6 +458,18 @@ async function saveChanges() {
 
       await writeCSV(file, csv);
     });
+
+    await Promise.all(fileActions);
+  });
+
+  Promise.all(tasks).then(() => {
+    bootstrap.Toast.getOrCreateInstance($("#changesSavedToast"), {
+      autohide: true,
+      delay: 3000,
+    }).show();
+
+    dbInterface.removeAllChanges();
+    updatePendingChanges();
   });
 }
 // END MAIN BLOCK

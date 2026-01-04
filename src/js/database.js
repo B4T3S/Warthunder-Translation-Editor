@@ -156,4 +156,8 @@ export default class Database {
 
     return result[0].values;
   }
+
+  removeAllChanges() {
+    this.db.exec("DELETE FROM changes;");
+  }
 }

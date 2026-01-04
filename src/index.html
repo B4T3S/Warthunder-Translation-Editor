@@ -225,18 +225,6 @@
         </div>
 
         <div
-            class="toast align-items-center bg-success position-absolute start-50 mt-2 translate-middle-x"
-            role="alert"
-            aria-live="assertive"
-            aria-atomic="true"
-            id="filesLoadedToast"
-        >
-            <div class="d-flex">
-                <div class="toast-body">All translation files loaded!</div>
-            </div>
-        </div>
-
-        <div
             class="w-100 d-flex flex-column justify-content-center align-items-center"
         >
             <p class="fw-light my-3">
@@ -329,6 +317,34 @@
                 >
                     <i class="bi bi-pencil-fill"></i> Save changes to WT
                 </button>
+            </div>
+        </div>
+        <div class="toast-container position-fixed bottom-0 end-0 p-3">
+            <div
+                class="toast bg-success"
+                role="alert"
+                aria-live="assertive"
+                aria-atomic="true"
+                id="filesLoadedToast"
+            >
+                <div class="d-flex">
+                    <div class="toast-body">All translation files loaded!</div>
+                </div>
+            </div>
+
+            <div
+                class="toast bg-success"
+                role="alert"
+                aria-live="assertive"
+                aria-atomic="true"
+                id="changesSavedToast"
+            >
+                <div class="d-flex">
+                    <div class="toast-body">
+                        Done saving changes to warthunder! (Re)start the game to
+                        see the changes!
+                    </div>
+                </div>
             </div>
         </div>
     </body>
